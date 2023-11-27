@@ -112,6 +112,7 @@ android {
 
     packagingOptions {
         pickFirst '**/*.so'
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
     sourceSets.main {
         jni.srcDirs = []
