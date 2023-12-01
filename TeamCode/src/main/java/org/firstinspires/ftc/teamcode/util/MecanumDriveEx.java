@@ -42,6 +42,7 @@ public class MecanumDriveEx extends MecanumDrive {
         super(RRConstants.kV, RRConstants.kA, RRConstants.kStatic, RRConstants.TRACK_WIDTH);
 
         voltageSensor = hwmap.getAll(VoltageSensor.class).get(0);
+        odometry = new DeadWheelOdometry(hwmap);
 
         for(String s : RRConstants.motors){
             DcMotorEx newMotor = hwmap.get(DcMotorEx.class, s);

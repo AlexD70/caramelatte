@@ -15,6 +15,18 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class RRConstants {
+    public static final double TICKS_PER_REV_ODOMETRY = 8192;
+    public static final double WHEEL_RADIUS_ODOMETRY = 1; // in
+    public static final double GEAR_RATIO_ODOMETRY = 1; // wheel speed / encoder speed
+
+    public static final double LATERAL_DISTANCE_ODOMETRY = 12.8; //in
+    public static final double FORWARD_OFFSET_ODOMETRY = 4.92; // in
+
+    public static double X_MULTIPLIER_ODOMETRY = 1;
+    public static double Y_MULTIPLIER_ODOMETRY = 1;
+
+    public static String[] odometry = {"LF", "RB", "LB"}; // left, right, perpendicular
+
     public static String[] motors = {"LF", "LB", "RF", "RB"};
 
     public static final double TICKS_PER_REV = 8192;
