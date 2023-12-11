@@ -6,7 +6,6 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.lib.Controller;
 
-
 public class Robot {
     private static Robot robotInst = null;
     public final MecanumDrive drive;
@@ -15,16 +14,18 @@ public class Robot {
     public final Lifter lifter;
     public final Camera camera;
     public final PlaneLauncher launcher;
+    public final Intake intake;
     public Controller ctrl1, ctrl2;
     private LinearOpMode activeOpmode;
 
     public Robot(@NonNull LinearOpMode opmode){
         drive = new MecanumDriveEx(opmode.hardwareMap);
         husky = new HuskyLensDetection(opmode.hardwareMap, "husky");
-        arm = new Arm(opmode.hardwareMap, "crsl", "crsr", "s", "m");
+        arm = new Arm(opmode.hardwareMap, "arm");
         lifter = new Lifter(opmode.hardwareMap, "left", "right");
         camera = new Camera(opmode.hardwareMap, "cam");
         launcher = new PlaneLauncher(opmode.hardwareMap, "plane");
+        intake = new Intake(opmode.hardwareMap, "crsleft", "crsright", "angleAdjust");
         changeOpMode(opmode);
     }
 
