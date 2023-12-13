@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.util.PlaneLauncher;
 public class TestLifter extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Lifter lift = new Lifter(hardwareMap, "lifter left", "lifter right");
-        PlaneLauncher launcher = new PlaneLauncher(hardwareMap, "LAUNCH");
-        Intake intake = new Intake(hardwareMap, "crsleft", "crsright", "servo");
+        Lifter lift = new Lifter(hardwareMap);
+        PlaneLauncher launcher = new PlaneLauncher(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()){

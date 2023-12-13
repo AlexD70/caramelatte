@@ -21,9 +21,11 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MecanumDriveEx extends MecanumDrive {
+    public DcMotorEx LF, LB, RB, RF;
     public ArrayList<DcMotorEx> motors = new ArrayList<>();
     public VoltageSensor voltageSensor;
     public HolonomicPIDVAFollower follower = new HolonomicPIDVAFollower(
@@ -44,16 +46,20 @@ public class MecanumDriveEx extends MecanumDrive {
         voltageSensor = hwmap.getAll(VoltageSensor.class).get(0);
         odometry = new DeadWheelOdometry(hwmap);
 
-        for(String s : RRConstants.motors){
-            DcMotorEx newMotor = hwmap.get(DcMotorEx.class, s);
-            newMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            newMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LF = hwmap.get(DcMotorEx.class, HardwareConfig.LF);
+        LB = hwmap.get(DcMotorEx.class, HardwareConfig.LB);
+        RF = hwmap.get(DcMotorEx.class, HardwareConfig.RF);
+        RB = hwmap.get(DcMotorEx.class, HardwareConfig.RB);
 
-            MotorConfigurationType config = newMotor.getMotorType().clone();
+        motors.addAll(Arrays.asList(LF, LB, RF, RB));
+
+        for(DcMotorEx m : motors){
+            m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            MotorConfigurationType config = m.getMotorType().clone();
             config.setAchieveableMaxRPMFraction(1);
-            newMotor.setMotorType(config);
-
-            motors.add(newMotor);
+            m.setMotorType(config);
         }
 
         setLocalizer(odometry);

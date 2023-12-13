@@ -25,9 +25,9 @@ public class RRConstants {
     public static double X_MULTIPLIER_ODOMETRY = 1;
     public static double Y_MULTIPLIER_ODOMETRY = 1;
 
-    public static String[] odometry = {"LF", "RB", "LB"}; // left, right, perpendicular
+    public static String[] odometry = {HardwareConfig.ODO_LEFT, HardwareConfig.ODO_RIGHT, HardwareConfig.ODO_PERP}; // left, right, perpendicular
 
-    public static String[] motors = {"LF", "LB", "RF", "RB"};
+    public static String[] motors = {HardwareConfig.LF, HardwareConfig.LB, HardwareConfig.RF, HardwareConfig.RB};
 
     public static final double TICKS_PER_REV = 8192;
     public static final double MAX_RPM = 312;

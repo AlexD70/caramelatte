@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -10,10 +12,10 @@ public class Intake {
 
     private Thread crsSchedulerThread = new Thread();
 
-    public Intake(HardwareMap hwmap, String crs_left, String crs_right, String servo){
-        crs_leftGecko = hwmap.get(CRServo.class, crs_left);
-        crs_rightGecko = hwmap.get(CRServo.class, crs_right);
-        s_angleAdjust = hwmap.get(Servo.class, servo);
+    public Intake(@NonNull HardwareMap hwmap){
+        crs_leftGecko = hwmap.get(CRServo.class, HardwareConfig.CRS_LEFT);
+        crs_rightGecko = hwmap.get(CRServo.class, HardwareConfig.CRS_RIGHT);
+        s_angleAdjust = hwmap.get(Servo.class, HardwareConfig.ANGLE_ADJUST);
     }
 
     // ===================== CRS ======================

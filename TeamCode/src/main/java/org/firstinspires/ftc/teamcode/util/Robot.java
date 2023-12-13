@@ -4,30 +4,37 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.teamcode.lib.Controller;
 
 public class Robot {
     private static Robot robotInst = null;
-    public final MecanumDrive drive;
+    public final MecanumDriveEx drive;
     public final HuskyLensDetection husky;
     public final Arm arm;
     public final Lifter lifter;
     public final Camera camera;
     public final PlaneLauncher launcher;
     public final Intake intake;
-    public Controller ctrl1, ctrl2;
-    private LinearOpMode activeOpmode;
 
-    public Robot(@NonNull LinearOpMode opmode){
-        drive = new MecanumDriveEx(opmode.hardwareMap);
-        husky = new HuskyLensDetection(opmode.hardwareMap, "husky");
-        arm = new Arm(opmode.hardwareMap, "arm");
-        lifter = new Lifter(opmode.hardwareMap, "left", "right");
-        camera = new Camera(opmode.hardwareMap, "cam");
-        launcher = new PlaneLauncher(opmode.hardwareMap, "plane");
-        intake = new Intake(opmode.hardwareMap, "crsleft", "crsright", "angleAdjust");
-        changeOpMode(opmode);
+    public Robot(@NonNull HardwareMap hardwareMap){
+        drive = new MecanumDriveEx(hardwareMap);
+        husky = new HuskyLensDetection(hardwareMap, "husky");
+        arm = new Arm(hardwareMap);
+        lifter = new Lifter(hardwareMap);
+        camera = new Camera(hardwareMap, "cam");
+        launcher = new PlaneLauncher(hardwareMap);
+        intake = new Intake(hardwareMap);
     }
+
+    public void update(){
+        arm.update();
+        lifter.update();
+        drive.update();
+    }
+
+    public void endAutonomous(){}
 
     public void initAutonomous(){
         // camera.init();
@@ -51,15 +58,10 @@ public class Robot {
         robotInst = this;
     }
 
-    public static Robot getRobotInstance(){
+    public static Robot getRobotInstance(HardwareMap hardwareMap){
+        if (robotInst == null) {
+            new Robot(hardwareMap).setGlobal();
+        }
         return robotInst;
     }
-
-    public void changeOpMode(LinearOpMode opmode){
-        activeOpmode = opmode;
-        ctrl1 = new Controller(opmode.gamepad1);
-        ctrl2 = new Controller(opmode.gamepad2);
-    }
-
-
 }
