@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.robotcore.hardware.CRServo;
+import  com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,7 +20,7 @@ public class Arm {
     }
 
     public enum ArmPositions {
-        INIT(0), COLLECT(0), PLACE(800), PRELOAD_PLACE(1500), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), COLLECT(0), PLACE(-800), PRELOAD_PLACE(-1500), MANUAL(-1), NO_ENCODER(-2);
 
         public int pos;
 

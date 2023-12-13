@@ -16,4 +16,14 @@ public class Lifter {
         left = hwmap.get(DcMotorEx.class, nameLeft);
         right = hwmap.get(DcMotorEx.class, nameRight);
     }
+
+    public enum LifterPositions {
+        INIT(0), COLLECT(0), PLACE(-800), PRELOAD_PLACE(-1500), MANUAL(-1), NO_ENCODER(-2);
+
+        public int pos;
+
+        LifterPositions(int pos) {
+            this.pos = pos;
+        }
+    }
 }

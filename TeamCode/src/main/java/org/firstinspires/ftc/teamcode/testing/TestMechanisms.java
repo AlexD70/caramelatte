@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Arm;
 import org.firstinspires.ftc.teamcode.util.Intake;
+import org.firstinspires.ftc.teamcode.util.Lifter;
 
 @TeleOp(name = "Test Arm & Intake", group = "Test")
 public class TestMechanisms extends LinearOpMode {
@@ -15,18 +16,23 @@ public class TestMechanisms extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         arm = new Arm(hardwareMap, "arm");
         intake = new Intake(hardwareMap, "crsleft", "crsright", "servo");
+        lifter = new Lifter(hardwareMap, "")
 
-        while(opModeIsActive()){
-            if(gamepad1.circle){
-                arm.forceArmToPosition(30);
+        waitForStart();
+
+        while(opModeIsActive() && !isStopRequested()){
+            arm.update();
+            tele
+            if(gamepad1.circle) {
+                arm.setArmTarget(Arm.ArmPositions.INIT);
             }
 
             if(gamepad1.cross){
-                arm.forceArmToPosition(-30);
+                arm.setArmTarget(Arm.ArmPositions.PRELOAD_PLACE);
             }
 
             if(gamepad1.square){
-                arm.setArmTarget(Arm.ArmPositions.INIT);
+                arm.setArmTarget(Arm.ArmPositions.PLACE);
             }
         }
     }
