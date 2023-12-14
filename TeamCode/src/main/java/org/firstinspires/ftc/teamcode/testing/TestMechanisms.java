@@ -19,7 +19,8 @@ public class TestMechanisms extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()){
-            arm.update();
+
+
             if(gamepad1.circle) {
                 arm.setArmTarget(Arm.ArmPositions.INIT);
             }
@@ -31,6 +32,10 @@ public class TestMechanisms extends LinearOpMode {
             if(gamepad1.square){
                 arm.setArmTarget(Arm.ArmPositions.PLACE);
             }
+            arm.update();
+            arm.printDebug(telemetry);
+            telemetry.addData("Arm position", arm.getArmPosition());
+            telemetry.update();
         }
     }
 }

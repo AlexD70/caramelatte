@@ -16,7 +16,7 @@ public class Arm {
     protected DcMotorEx m_armMotor;
 
     private int armPosition = 0, armTarget = 0, lastArmTarget = 0;
-    private final double kP = 0.001, kD = 0, kI = 0, kCos = 0.2;
+    private final double kP = 0.08, kD = 0, kI = 0.00001, kCos = 0;
     private final ArmControllerPID pid = new ArmControllerPID(kP, kD, kI, kCos);
     private boolean armInManual = false, isBusy = false; // manual actually means dont use encoders
     private double manualArmPower = 0, power = 0;
@@ -29,7 +29,7 @@ public class Arm {
         m_armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_armMotor.setDirection(DcMotorSimple.Direction.REVERSE); // use this to have positive state positions
 
-        pid.setPowerLimits(-0.3, 0.3);
+        pid.setPowerLimits(-0.7, 0.7);
     }
 
     public enum ArmPositions {
