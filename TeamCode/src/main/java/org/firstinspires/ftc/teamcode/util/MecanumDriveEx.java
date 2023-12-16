@@ -16,6 +16,7 @@ import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
@@ -52,6 +53,9 @@ public class MecanumDriveEx extends MecanumDrive {
         RB = hwmap.get(DcMotorEx.class, HardwareConfig.RB);
 
         motors.addAll(Arrays.asList(LF, LB, RF, RB));
+
+        //LB.setDirection(DcMotorSimple.Direction.REVERSE);
+        //RF.setDirection(DcMotorSimple.Direction.REVERSE);
 
         for(DcMotorEx m : motors){
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -104,8 +108,12 @@ public class MecanumDriveEx extends MecanumDrive {
 
     public void update(){
         updatePoseEstimate();
-        DriveSignal signal = follower.update(odometry.getPoseEstimate(), odometry.getPoseVelocity());
-        setDriveSignal(signal);
+        try {
+            DriveSignal signal = follower.update(odometry.getPoseEstimate(), odometry.getPoseVelocity());
+            setDriveSignal(signal);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public Pose2d getLastPoseError(){

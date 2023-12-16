@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.ArmControllerPID;
@@ -16,7 +17,7 @@ public class Arm {
     protected DcMotorEx m_armMotor;
 
     private int armPosition = 0, armTarget = 0, lastArmTarget = 0;
-    private final double kP = 0.001, kD = 0, kI = 0, kCos = 0.2;
+    private final double kP = 0.0035, kD = 0, kI = 0, kCos = 0.1;
     private final ArmControllerPID pid = new ArmControllerPID(kP, kD, kI, kCos);
     private boolean armInManual = false, isBusy = false; // manual actually means dont use encoders
     private double manualArmPower = 0, power = 0;
@@ -29,11 +30,11 @@ public class Arm {
         m_armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_armMotor.setDirection(DcMotorSimple.Direction.REVERSE); // use this to have positive state positions
 
-        pid.setPowerLimits(-0.3, 0.3);
+        pid.setPowerLimits(-0.7, 0.7);
     }
 
     public enum ArmPositions {
-        INIT(0), COLLECT(0), PLACE(1500), PRELOAD_PLACE(2000), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), COLLECT(100), PLACE(1500), PRELOAD_PLACE(1800), MANUAL(-1), NO_ENCODER(-2);
 
         public int pos;
 
@@ -43,9 +44,9 @@ public class Arm {
     }
     private ArmPositions currentState;
 
-    public final static double TICKS_TO_DEG = 1;
+    public final static double TICKS_TO_RAD = Math.PI * 2 / (28 * 103.8), INIT_RAD = -Math.PI/3;
     public double getApproximateAngle(){
-        return TICKS_TO_DEG * armPosition;
+        return TICKS_TO_RAD * armPosition + INIT_RAD;
     }
 
     public ArmPositions getArmState(){
@@ -60,7 +61,9 @@ public class Arm {
         return isBusy;
     }
 
-    public void update(){
+    private int ticksOnLastUpdateCall = armPosition;
+    private ElapsedTime timer = new ElapsedTime();
+    public void update(Telemetry telemetry){
         armPosition = m_armMotor.getCurrentPosition();
 
         if(!armInManual) {
@@ -68,21 +71,31 @@ public class Arm {
                 pid.setTarget(armTarget);
                 pid.resetSum();
                 isBusy = true;
+                timer.reset();
 
                 lastArmTarget = armTarget;
             }
 
-            if(Math.abs(armTarget - armPosition) > 10){
-                double pow = pid.update(armPosition, getApproximateAngle());
+            if(ticksOnLastUpdateCall == armPosition && timer.seconds() > 1.5){
+                isBusy = false; // fix busy function to return false if arm not moving at all
+                timer.reset();
+            }
+
+            if(Math.abs(armTarget - armPosition) > 20 && isBusy){
+                double pow = pid.update(armPosition, getApproximateAngle(), telemetry);
                 power = pow;
                 m_armMotor.setPower(pow);
-            } else if (Math.abs(armTarget - armPosition) < 10){
+            } else if (Math.abs(armTarget - armPosition) < 20){
                 isBusy = false;
+                power = 0;
+                m_armMotor.setPower(0);
             }
         } else {
             m_armMotor.setPower(manualArmPower);
             power = manualArmPower;
         }
+
+        ticksOnLastUpdateCall = armPosition;
     }
 
     private void setArmTarget(int target){

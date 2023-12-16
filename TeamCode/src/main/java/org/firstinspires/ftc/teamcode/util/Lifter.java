@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.lib.PIDF;
 public class Lifter {
     protected DcMotorEx m_left, m_right;
 
+    // lower kP until lifter is no longer spasming around target position
     private final double kP = 0.008d, kD = 0d, kI = 0.00001d;
     private final Supplier<Double> kF = () -> 0.02d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
@@ -58,7 +59,7 @@ public class Lifter {
             lastTarget = target;
         }
 
-        if(Math.abs(currentPosition - target) > 10){
+        if(Math.abs(currentPosition - target) > 20){
             double pow = pidf.update(currentPosition);
             power = pow;
             m_right.setPower(pow);

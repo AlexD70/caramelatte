@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.lib;
 
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class ArmControllerPID {
     public final double kP, kD, kI, kCos;
     private int targetPosition, currentPosition, sum = 0, deriv, lastError = 0;
@@ -31,9 +33,12 @@ public class ArmControllerPID {
         maxPow = max;
     }
 
-    public double update(int currentPos, double currentRadians){
+    public double update(int currentPos, double currentRadians, Telemetry telemetry){
         int e = targetPosition - currentPos;
         int delta_e = lastError - e;
+        telemetry.addData("rad", currentRadians);
+        telemetry.addData("cos", Math.cos(currentRadians));
+        telemetry.addData("cos*k", kCos * Math.cos(currentRadians));
 
         sum += e;
         lastError = e;

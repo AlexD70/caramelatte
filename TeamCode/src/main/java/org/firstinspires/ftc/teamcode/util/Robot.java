@@ -29,7 +29,7 @@ public class Robot {
     }
 
     public void update(){
-        arm.update();
+        arm.update(null);
         lifter.update();
         drive.update();
     }

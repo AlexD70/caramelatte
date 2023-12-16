@@ -89,7 +89,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        /*imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
@@ -115,11 +115,11 @@ public class SampleMecanumDrive extends MecanumDrive {
         //
         // For example, if +Y in this diagram faces downwards, you would use AxisDirection.NEG_Y.
         // BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_Y);
-
-        LF = hardwareMap.get(DcMotorEx.class, "RB");
-        LB = hardwareMap.get(DcMotorEx.class, "RF");
-        RB = hardwareMap.get(DcMotorEx.class, "LF");
-        RF = hardwareMap.get(DcMotorEx.class, "LB"); //done
+        */
+        LF = hardwareMap.get(DcMotorEx.class, "LF");
+        LB = hardwareMap.get(DcMotorEx.class, "LB");
+        RB = hardwareMap.get(DcMotorEx.class, "RB");
+        RF = hardwareMap.get(DcMotorEx.class, "RF"); //done
 //good version
 //        LF.setDirection(DcMotorSimple.Direction.REVERSE);
 //        LB.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -127,11 +127,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 //        RB.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //reversed version
-
-        LF.setDirection(DcMotorSimple.Direction.REVERSE); //????
-        LB.setDirection(DcMotorSimple.Direction.REVERSE);
-        RF.setDirection(DcMotorSimple.Direction.FORWARD);
-        RB.setDirection(DcMotorSimple.Direction.FORWARD);
 
         motors = Arrays.asList(LF, LB, RB, RF);
 
@@ -307,8 +302,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         LF.setPower(v);
         LB.setPower(v1);
-        RB.setPower(v2);
-        RF.setPower(v3);
+        RF.setPower(v2);
+        RB.setPower(v3);
     }
 
     @Override
