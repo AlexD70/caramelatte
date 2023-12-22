@@ -23,18 +23,15 @@ public class LocalizationTest extends LinearOpMode {
         StandardTrackingWheelLocalizer stwl = new StandardTrackingWheelLocalizer(hardwareMap);
         telemetry = new MultipleTelemetry(telemetry);
         SampleMecanumDrive.telemetry = telemetry;
-//        DcMotleftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "lifterRight"));
-//        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RB"));
-//        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
 
         waitForStart();
 
         while (!isStopRequested()) {
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.right_stick_x,
-                            gamepad1.left_stick_x,
-                            -gamepad1.left_stick_y
+                            -gamepad1.left_stick_y,
+                            -gamepad1.left_stick_x,
+                            gamepad1.right_stick_x
                     )
             );
 

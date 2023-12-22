@@ -21,6 +21,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,8 +44,32 @@ public class MecanumDriveEx extends MecanumDrive {
     public Localizer odometry = null;
     protected boolean isTurning = false, hasJustTurned = false;
     public PIDFController turnController = new PIDFController(RRConstants.HEADING_PID);
+    TrajectorySequenceRunner sequenceRunner = new TrajectorySequenceRunner(follower, RRConstants.HEADING_PID);
 
-    public MecanumDriveEx(HardwareMap hwmap){
+    @Override
+    protected double getRawExternalHeading() {
+        throw new RuntimeException("Stub!");
+    }
+
+    @NonNull
+    @Override
+    public List<Double> getWheelPositions() {
+        throw new RuntimeException("Stub!");
+    }
+
+    @Override
+    public void setMotorPowers(double lf, double lb, double rf, double rb) {
+        motors.get(0).setPower(lf);
+        motors.get(1).setPower(lb);
+        motors.get(2).setPower(rf);
+        motors.get(3).setPower(rb);
+    }
+
+    public void setDrivePowerWeighted(Pose2d xyt, double weight){
+        setDrivePower(xyt.times(weight));
+    }
+
+    public MecanumDriveEx(@NonNull HardwareMap hwmap){
         super(RRConstants.kV, RRConstants.kA, RRConstants.kStatic, RRConstants.TRACK_WIDTH);
 
         voltageSensor = hwmap.getAll(VoltageSensor.class).get(0);
@@ -70,33 +98,15 @@ public class MecanumDriveEx extends MecanumDrive {
         turnController.setInputBounds(0, Math.PI * 2);
     }
 
-    @Override
-    protected double getRawExternalHeading() {
-        throw new RuntimeException("Stub!");
-    }
-
-    @NonNull
-    @Override
-    public List<Double> getWheelPositions() {
-        throw new RuntimeException("Stub!");
-    }
-
-    @Override
-    public void setMotorPowers(double lf, double lb, double rf, double rb) {
-        motors.get(0).setPower(lf);
-        motors.get(1).setPower(lb);
-        motors.get(2).setPower(rf);
-        motors.get(3).setPower(rb);
-    }
-
-    public void setDrivePowerWeighted(Pose2d xyt, double weight){
-        setDrivePower(xyt.times(weight));
-    }
-
     public boolean isBusy(){
+        if(sequenceRunner.isBusy()){
+            return true;
+        }
+
         if (isTurning) {
             return true;
         }
+
         return follower.isFollowing();
     }
 
@@ -201,5 +211,18 @@ public class MecanumDriveEx extends MecanumDrive {
 
         renewBuilder(lastPose.plus(getLastPoseError()));
         return lastPose;
+    }
+
+    public void updateSeq(){
+        updatePoseEstimate();
+        DriveSignal signal = sequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        setDriveSignal(signal);
+    }
+
+    public void followTrajSeq(TrajectorySequence seq){
+        sequenceRunner.followTrajectorySequenceAsync(seq);
+        while(sequenceRunner.isBusy()){
+            updateSeq();
+        }
     }
 }
