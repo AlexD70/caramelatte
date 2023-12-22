@@ -44,10 +44,10 @@ import java.util.List;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(9, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1;
+    public static double LATERAL_MULTIPLIER = 1.45;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -121,10 +121,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         RB = hardwareMap.get(DcMotorEx.class, "RB");
         RF = hardwareMap.get(DcMotorEx.class, "RF"); //done
 //good version
-//        LF.setDirection(DcMotorSimple.Direction.REVERSE);
-//        LB.setDirection(DcMotorSimple.Direction.REVERSE);
-//        RF.setDirection(DcMotorSimple.Direction.FORWARD);
-//        RB.setDirection(DcMotorSimple.Direction.FORWARD);
+        LF.setDirection(DcMotorSimple.Direction.REVERSE);
+        LB.setDirection(DcMotorSimple.Direction.REVERSE);
+//        RF.setDirection(DcMotorSimple.Direction.REVERSE);
+//        RB.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //reversed version
 
@@ -302,8 +302,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         LF.setPower(v);
         LB.setPower(v1);
-        RF.setPower(v2);
-        RB.setPower(v3);
+        RB.setPower(v2);
+        RF.setPower(v3);
     }
 
     @Override
