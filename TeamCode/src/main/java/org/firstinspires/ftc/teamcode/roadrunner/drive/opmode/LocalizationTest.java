@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer;
@@ -39,6 +40,11 @@ public class LocalizationTest extends LinearOpMode {
             );
 
             drive.update();
+
+            if (gamepad1.circle)
+                drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            if (gamepad1.triangle)
+                drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             Pose2d poseEstimate = drive.getPoseEstimate();
 

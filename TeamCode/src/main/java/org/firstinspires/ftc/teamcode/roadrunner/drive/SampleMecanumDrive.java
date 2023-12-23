@@ -121,8 +121,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         RB = hardwareMap.get(DcMotorEx.class, "RB");
         RF = hardwareMap.get(DcMotorEx.class, "RF"); //done
 //good version
-//        LF.setDirection(DcMotorSimple.Direction.REVERSE);
-//        LB.setDirection(DcMotorSimple.Direction.REVERSE);
+        LF.setDirection(DcMotorSimple.Direction.REVERSE);
+        LB.setDirection(DcMotorSimple.Direction.REVERSE);
 //        RF.setDirection(DcMotorSimple.Direction.FORWARD);
 //        RB.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -302,8 +302,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         LF.setPower(v);
         LB.setPower(v1);
-        RF.setPower(v2);
-        RB.setPower(v3);
+        RF.setPower(v3);
+        RB.setPower(v2);
     }
 
     @Override
