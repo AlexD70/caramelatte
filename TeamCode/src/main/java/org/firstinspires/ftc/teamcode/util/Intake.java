@@ -20,7 +20,7 @@ public class Intake {
 
     // ===================== CRS ======================
 
-    private void setCRSPowers(double power){
+    public void setCRSPowers(double power){
         crs_leftGecko.setPower(power);
         crs_rightGecko.setPower(-power);
     }

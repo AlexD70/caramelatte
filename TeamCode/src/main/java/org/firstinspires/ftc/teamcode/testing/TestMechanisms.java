@@ -30,37 +30,44 @@ public class TestMechanisms extends LinearOpMode {
             arm.update(telemetry);
             lift.update();
 
-            if(gamepad1.circle) {
+            if(gamepad2.circle) {
                 lift.goToPos(Lifter.LifterStates.DOWN);
                 arm.setArmTarget(Arm.ArmPositions.COLLECT);
-                intake.forceAngleServoPos(1);
+                intake.forceAngleServoPos(0.55);
             }
 
-            if(gamepad1.cross){
+            if(gamepad2.cross){
                 arm.setArmTarget(Arm.ArmPositions.PRELOAD_PLACE);
                 intake.forceAngleServoPos(0.9);
             }
 
-            if(gamepad1.square){
+            if(gamepad2.square){
                 lift.goToPos(Lifter.LifterStates.HIGH);
             }
 
-            if(gamepad1.triangle){
+            if(gamepad2.triangle){
                 lift.goToPos(Lifter.LifterStates.DOWN);
             }
 
-            if(gamepad1.left_bumper){
-                intake.startCollect();
-                intake.forceAngleServoPos(0.54);
-            }
-
-            if(gamepad1.right_bumper){
-                intake.stopCollect();
-                intake.forceAngleServoPos(1);
-            }
-
-            if(gamepad1.dpad_down){
-                intake.dropPixel();
+//            if(gamepad1.left_bumper){
+//                intake.startCollect();
+//                intake.forceAngleServoPos(0.54);
+//            }
+//
+//            if(gamepad1.right_bumper){
+//                intake.stopCollect();
+//                intake.forceAngleServoPos(1);
+//            }
+//
+//            if(gamepad1.dpad_down){
+//                intake.dropPixel();
+//            }
+            if(gamepad1.left_trigger > 0.3){
+                intake.setCRSPowers(.5);
+            } else if (gamepad1.right_trigger > 0.3){
+                intake.setCRSPowers(-0.5);
+            } else {
+                intake.setCRSPowers(0);
             }
 
             arm.printDebug(telemetry);

@@ -15,7 +15,7 @@ public class Lifter {
     protected DcMotorEx m_left, m_right;
 
     // lower kP until lifter is no longer spasming around target position
-    private final double kP = 0.008d, kD = 0d, kI = 0.00001d;
+    private final double kP = 0.0005d, kD = 0d, kI = 0.00001d;
     private final Supplier<Double> kF = () -> 0.02d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
 
