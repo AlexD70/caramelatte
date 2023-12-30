@@ -64,36 +64,36 @@ public class Controller {
         return b.isDown();
     }
 
-   public boolean isButtonReleased(Button b){
+    public boolean isButtonReleased(Button b){
         return b.isReleased();
    }
 
-   // old once
-   public boolean isButtonPressed(Button b){
+    // old once
+    public boolean isButtonPressed(Button b){
         return b.isPressed();
    }
 
-   public boolean isLeftTriggerDown(){
+    public boolean isLeftTriggerDown(){
         return ltrigcounter > 0;
    }
 
-   public boolean isRightTriggerDown(){
+    public boolean isRightTriggerDown(){
         return rtrigcounter > 0;
    }
 
-   public boolean isRightTriggerPressed(){
+    public boolean isRightTriggerPressed(){
         return rtrigcounter == 1;
    }
 
-   public boolean isLeftTriggerPressed(){
+    public boolean isLeftTriggerPressed(){
         return ltrigcounter == 1;
    }
 
-   public void setLeftTriggerThreshold(double t){
+    public void setLeftTriggerThreshold(double t){
         ltrigthresh = t;
    }
 
-   public void setRightTriggerThreshold(double t){
+    public void setRightTriggerThreshold(double t){
         rtrigthresh = t;
    }
 }

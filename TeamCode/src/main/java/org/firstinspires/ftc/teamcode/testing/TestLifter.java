@@ -43,7 +43,7 @@ public class TestLifter extends LinearOpMode {
             }
 
             if(gamepad1.dpad_down){
-                intake.toggleAngleAdjustPos();
+                //intake.toggleAngleAdjustPos();
             }
 
             telemetry.addData("target:", lift.target);

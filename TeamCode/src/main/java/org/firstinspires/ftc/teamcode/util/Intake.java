@@ -25,9 +25,14 @@ public class Intake {
         crs_rightGecko.setPower(-power);
     }
 
+    public void startEject(){
+        interruptCRSScheduler();
+        setCRSPowers(-0.55);
+    }
+
     public void startCollect(){
         interruptCRSScheduler();
-        setCRSPowers(.5);
+        setCRSPowers(.55);
     }
 
     public void stopCollect(){
@@ -81,21 +86,16 @@ public class Intake {
     // ====================== ANGLE ADJUST =====================
 
     public enum AngleAdjustStates {
-        INIT(0d), COLLECT_POS(0d), PLACE_POS(.3), MANUAL(-1);
+        INIT(0d), COLLECT_POS(0.55), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
 
         public double val;
         AngleAdjustStates(double val){this.val = val;}
     }
     private AngleAdjustStates currentState = AngleAdjustStates.INIT;
 
-    public void toggleAngleAdjustPos(){
-        if(currentState != AngleAdjustStates.PLACE_POS){
-            s_angleAdjust.setPosition(AngleAdjustStates.PLACE_POS.val);
-            currentState = AngleAdjustStates.PLACE_POS;
-        } else {
-            s_angleAdjust.setPosition(AngleAdjustStates.COLLECT_POS.val);
-            currentState = AngleAdjustStates.COLLECT_POS;
-        }
+    public void toAngle(AngleAdjustStates state){
+        s_angleAdjust.setPosition(state.val);
+        currentState = state;
     }
 
     public void forceAngleServoPos(double pos){

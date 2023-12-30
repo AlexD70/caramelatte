@@ -4,54 +4,68 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.Controller;
 
 public class Robot {
     private static Robot robotInst = null;
     public final MecanumDriveEx drive;
-    public final HuskyLensDetection husky;
+    //public final HuskyLensDetection husky;
     public final Arm arm;
     public final Lifter lifter;
-    public final Camera camera;
+    //public final Camera camera;
     public final PlaneLauncher launcher;
     public final Intake intake;
+    public Telemetry telemetry;
+
+    public boolean debugMode = false;
+
+    public boolean isHanged = false;
+    public enum RobotTeleOpStates {
+        NORMAL, HANGING_MODE, WAITING, STANDBY
+    }
+    public RobotTeleOpStates teleopstate = RobotTeleOpStates.STANDBY;
+
+    public void setState(RobotTeleOpStates state){
+        teleopstate = state;
+    }
+    public RobotTeleOpStates getTeleOpState(){
+        return teleopstate;
+    }
 
     public Robot(@NonNull HardwareMap hardwareMap){
         drive = new MecanumDriveEx(hardwareMap);
-        husky = new HuskyLensDetection(hardwareMap, "husky");
+        //husky = new HuskyLensDetection(hardwareMap, "husky");
         arm = new Arm(hardwareMap);
         lifter = new Lifter(hardwareMap);
-        camera = new Camera(hardwareMap, "cam");
+        //camera = new Camera(hardwareMap, "cam");
         launcher = new PlaneLauncher(hardwareMap);
         intake = new Intake(hardwareMap);
     }
 
     public void update(){
-        arm.update(null);
+        arm.update(telemetry);
         lifter.update();
-        drive.update();
+        //drive.update();
     }
 
-    public void endAutonomous(){}
+    public void setTelemetry(Telemetry telemetry){
+        this.telemetry = telemetry;
+    }
 
-    public void initAutonomous(){
-        // camera.init();
-        // camera.startAsync();
-        // husky.init();
-        // arm.init();
-        // lifter.init();
-        // enable bulk reads???
+    public void toggleDebug(){
+        debugMode = !debugMode;
+    }
+    public boolean isInDebugMode(){
+        return debugMode;
     }
 
     public void initTeleOp(){
-        // launcher.init()
-        // lifter.goToInitPos();
-        // lifter.reset();
-        // arm.goToInitPos();
-        // arm.reset();
-        // drive.odometry ???
+        arm.setArmTarget(Arm.ArmPositions.COLLECT);
+        RobotTeleOpActions.initActions();
     }
 
     public void setGlobal(){
@@ -62,6 +76,11 @@ public class Robot {
         if (robotInst == null) {
             new Robot(hardwareMap).setGlobal();
         }
+
+        if(hardwareMap == null){
+            throw new RuntimeException("Problem initializing! Try performing RobotSetup first!");
+        }
+
         return robotInst;
     }
 }

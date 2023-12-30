@@ -34,7 +34,7 @@ public class Arm {
     }
 
     public enum ArmPositions {
-        INIT(0), COLLECT(0), PLACE(1500), PRELOAD_PLACE(1800), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), COLLECT(0), PLACE(1800), PRELOAD_PLACE(1800), HANG(1200), MANUAL(-1), NO_ENCODER(-2);
 
         public int pos;
 

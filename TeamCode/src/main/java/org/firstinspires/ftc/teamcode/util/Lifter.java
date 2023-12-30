@@ -31,7 +31,7 @@ public class Lifter {
     }
 
     public enum LifterStates {
-        INIT(0), DOWN(10), MID(1000), HIGH(1500), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), DOWN(10), MID(1000), HIGH(1500), HANG(600), MANUAL(-1), NO_ENCODER(-2);
 
         public int pos;
         LifterStates(int pos){this.pos = pos;}
@@ -40,6 +40,10 @@ public class Lifter {
 
     public int lastTarget = 0, target = 0, currentPosition = 0;
     public double power = 0;
+
+    public int getPos(){
+        return currentPosition;
+    }
 
     public void goToPos(int x){
         lifterState = LifterStates.MANUAL;
@@ -59,12 +63,16 @@ public class Lifter {
             lastTarget = target;
         }
 
-        if(Math.abs(currentPosition - target) > 20){
+        if(Math.abs(currentPosition - target) > 15){
             double pow = pidf.update(currentPosition);
             power = pow;
             m_right.setPower(pow);
             m_left.setPower(pow);
         }
+    }
+
+    public boolean isBusy(){
+        return Math.abs(currentPosition - target) > 15;
     }
 
     public void printDebug(@NonNull Telemetry telemetry){
