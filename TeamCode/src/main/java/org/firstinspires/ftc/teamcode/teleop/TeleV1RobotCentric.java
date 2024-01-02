@@ -74,9 +74,11 @@ public class TeleV1RobotCentric extends LinearOpMode {
             ctrl1.update();
             ctrl2.update();
             bot.update();
+            telemetry.update();
+
             Robot.RobotTeleOpStates botState = bot.getTeleOpState();
 
-            if (botState == Robot.RobotTeleOpStates.NORMAL) {
+            if (botState == Robot.RobotTeleOpStates.RUNNING) {
                 controller1Actions();
                 controller2Actions();
             } else if (botState == Robot.RobotTeleOpStates.HANGING_MODE) {

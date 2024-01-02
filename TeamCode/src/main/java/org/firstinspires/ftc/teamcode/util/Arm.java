@@ -44,9 +44,14 @@ public class Arm {
     }
     private ArmPositions currentState;
 
+    private int deltaTicks = 0;
+    public void setStartPosition(int pos){
+        deltaTicks = pos;
+    }
+
     public final static double TICKS_TO_RAD = Math.PI * 2 / (28 * 103.8), INIT_RAD = -Math.PI/3;
     public double getApproximateAngle(){
-        return TICKS_TO_RAD * armPosition + INIT_RAD;
+        return TICKS_TO_RAD * getArmPosition() + INIT_RAD;
     }
 
     public ArmPositions getArmState(){

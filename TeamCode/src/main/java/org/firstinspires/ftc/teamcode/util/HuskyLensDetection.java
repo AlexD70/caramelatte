@@ -29,7 +29,7 @@ public class HuskyLensDetection {
             lens.knock();
 
             try {
-                Thread.sleep(20);
+                Thread.sleep(25);
             } catch (InterruptedException e) {
                 break;
             }

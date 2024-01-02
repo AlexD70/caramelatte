@@ -17,6 +17,7 @@ public class RobotTeleOpActions {
 
     public static void start(){
         timer.reset();
+        bot.setState(Robot.RobotTeleOpStates.RUNNING);
     }
 
     public static void drive(@NonNull Controller ctrl, double weight){
@@ -108,7 +109,7 @@ public class RobotTeleOpActions {
             }
             bot.isHanged = false;
         } else if (bot.getTeleOpState() == Robot.RobotTeleOpStates.HANGING_MODE){
-            bot.setState(Robot.RobotTeleOpStates.NORMAL);
+            bot.setState(Robot.RobotTeleOpStates.RUNNING);
         }
     }
 

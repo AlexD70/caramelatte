@@ -2,13 +2,9 @@ package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
 
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.lib.Controller;
 
 public class Robot {
     private static Robot robotInst = null;
@@ -25,7 +21,7 @@ public class Robot {
 
     public boolean isHanged = false;
     public enum RobotTeleOpStates {
-        NORMAL, HANGING_MODE, WAITING, STANDBY
+        RUNNING, HANGING_MODE, WAITING, STANDBY
     }
     public RobotTeleOpStates teleopstate = RobotTeleOpStates.STANDBY;
 
@@ -49,6 +45,10 @@ public class Robot {
     public void update(){
         arm.update(telemetry);
         lifter.update();
+        if(debugMode){
+            arm.printDebug(telemetry);
+            lifter.printDebug(telemetry);
+        }
         //drive.update();
     }
 
@@ -66,6 +66,10 @@ public class Robot {
     public void initTeleOp(){
         arm.setArmTarget(Arm.ArmPositions.COLLECT);
         RobotTeleOpActions.initActions();
+    }
+
+    public void preserveMechanismPositions(){
+        throw new RuntimeException("Unimplemented!");
     }
 
     public void setGlobal(){
