@@ -5,10 +5,12 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 public class Robot {
     private static Robot robotInst = null;
-    public final MecanumDriveEx drive;
+    public MecanumDriveEx drive;
+    public SampleMecanumDrive rr;
     //public final HuskyLensDetection husky;
     public final Arm arm;
     public final Lifter lifter;
@@ -24,6 +26,10 @@ public class Robot {
         RUNNING, HANGING_MODE, WAITING, STANDBY
     }
     public RobotTeleOpStates teleopstate = RobotTeleOpStates.STANDBY;
+
+    public enum RobotAutoStates {
+        RUNNING, WAITING, STANDBY
+    }
 
     public void setState(RobotTeleOpStates state){
         teleopstate = state;
@@ -65,7 +71,13 @@ public class Robot {
 
     public void initTeleOp(){
         arm.setArmTarget(Arm.ArmPositions.COLLECT);
-        RobotTeleOpActions.initActions();
+        RobotTeleOpActions.initActions(this);
+    }
+
+    public void initAuto(HardwareMap hwmap){
+        rr = new SampleMecanumDrive(hwmap);
+        arm.setArmTarget(Arm.ArmPositions.COLLECT);
+
     }
 
     public void preserveMechanismPositions(){
@@ -77,12 +89,12 @@ public class Robot {
     }
 
     public static Robot getRobotInstance(HardwareMap hardwareMap){
-        if (robotInst == null) {
-            new Robot(hardwareMap).setGlobal();
+        if(robotInst == null && hardwareMap == null){
+            throw new RuntimeException("Problem initializing");
         }
 
-        if(hardwareMap == null){
-            throw new RuntimeException("Problem initializing! Try performing RobotSetup first!");
+        if (robotInst == null) {
+            new Robot(hardwareMap).setGlobal();
         }
 
         return robotInst;

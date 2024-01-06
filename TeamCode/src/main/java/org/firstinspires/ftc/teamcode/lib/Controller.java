@@ -10,6 +10,7 @@ public class Controller {
     public Button square, circle, cross, triangle, share, options;
     public Button dpadUp, dpadDown, dpadLeft, dpadRight;
     public Button bumperRight, bumperLeft;
+    public Button leftTriggerButton, rightTriggerButton;
 
     public double rightStickX, rightStickY; // right
     public double leftStickX, leftStickY; // left
@@ -32,6 +33,8 @@ public class Controller {
         dpadRight = new Button(() -> g.dpad_right);
         bumperRight = new Button(() -> g.right_bumper);
         bumperLeft = new Button(() -> g.left_bumper);
+        leftTriggerButton = new Button(this::isLeftTriggerDown);
+        rightTriggerButton = new Button(this::isRightTriggerDown);
     }
 
     public void update(){
@@ -58,6 +61,8 @@ public class Controller {
 
         rtrigcounter = (rightTrigger > rtrigthresh)?(rtrigcounter + 1):(0);
         ltrigcounter = (leftTrigger > ltrigthresh)?(ltrigcounter + 1):(0);
+        leftTriggerButton.update();
+        rightTriggerButton.update();
     }
 
     public boolean isButtonDown(Button b){

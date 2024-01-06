@@ -15,7 +15,7 @@ public class Lifter {
     protected DcMotorEx m_left, m_right;
 
     // lower kP until lifter is no longer spasming around target position
-    private final double kP = 0.0005d, kD = 0d, kI = 0.00001d;
+    private final double kP = 0.004d, kD = 0d, kI = 0.00001d;
     private final Supplier<Double> kF = () -> 0.02d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
 
@@ -25,13 +25,27 @@ public class Lifter {
 
         m_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         m_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        m_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        m_left.setDirection(DcMotorSimple.Direction.FORWARD);
+    }
+
+    public void reset(){
+        m_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        m_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        m_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        m_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        m_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        m_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        m_left.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public enum LifterStates {
-        INIT(0), DOWN(10), MID(1000), HIGH(1500), HANG(600), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), DOWN(10), MID(1000), HIGH(1500), ULTRA_HIGH(1900), HANG(600), MANUAL(-1), NO_ENCODER(-2);
 
         public int pos;
         LifterStates(int pos){this.pos = pos;}
@@ -63,7 +77,7 @@ public class Lifter {
             lastTarget = target;
         }
 
-        if(Math.abs(currentPosition - target) > 15){
+        if((Math.abs(currentPosition - target) > 20) || lifterState == LifterStates.MANUAL){
             double pow = pidf.update(currentPosition);
             power = pow;
             m_right.setPower(pow);
@@ -72,7 +86,7 @@ public class Lifter {
     }
 
     public boolean isBusy(){
-        return Math.abs(currentPosition - target) > 15;
+        return (Math.abs(currentPosition - target) > 20) && (lifterState != LifterStates.MANUAL);
     }
 
     public void printDebug(@NonNull Telemetry telemetry){

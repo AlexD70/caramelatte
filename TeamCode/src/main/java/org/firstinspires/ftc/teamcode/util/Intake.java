@@ -60,7 +60,7 @@ public class Intake {
     public void dropPixel() {
         interruptCRSScheduler();
         crsSchedulerThread = new Thread(() -> {
-            setCRSPowers(-0.3);
+            setCRSPowers(-0.5);
 
             try {
                 Thread.sleep(500);
@@ -71,7 +71,7 @@ public class Intake {
             setCRSPowers(0);
         });
 
-        crsSchedulerThread.start();
+        crsSchedulerThread.run();
     }
 
     public void interruptCRSScheduler() {
@@ -86,7 +86,7 @@ public class Intake {
     // ====================== ANGLE ADJUST =====================
 
     public enum AngleAdjustStates {
-        INIT(0d), COLLECT_POS(0.55), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
+        INIT(0d), COLLECT_POS(0.5), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
 
         public double val;
         AngleAdjustStates(double val){this.val = val;}

@@ -17,7 +17,7 @@ public class Arm {
     protected DcMotorEx m_armMotor;
 
     private int armPosition = 0, armTarget = 0, lastArmTarget = 0;
-    private final double kP = 0.0035, kD = 0, kI = 0, kCos = 0.1;
+    private final double kP = 0.0035, kD = 0, kI = 0.00001, kCos = 0.1;
     private final ArmControllerPID pid = new ArmControllerPID(kP, kD, kI, kCos);
     private boolean armInManual = false, isBusy = false; // manual actually means dont use encoders
     private double manualArmPower = 0, power = 0;
@@ -27,6 +27,7 @@ public class Arm {
     public Arm(@NonNull HardwareMap hwmap){
         m_armMotor = hwmap.get(DcMotorEx.class, HardwareConfig.ARM);
         m_armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        m_armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m_armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_armMotor.setDirection(DcMotorSimple.Direction.REVERSE); // use this to have positive state positions
 
@@ -34,7 +35,7 @@ public class Arm {
     }
 
     public enum ArmPositions {
-        INIT(0), COLLECT(0), PLACE(1800), PRELOAD_PLACE(1800), HANG(1200), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), COLLECT(0), PLACE(1800), PRELOAD_PLACE(1800), PLACE_AUTO(1600), HANG(1200), MANUAL(-1), NO_ENCODER(-2);
 
         public int pos;
 
@@ -42,7 +43,7 @@ public class Arm {
             this.pos = pos;
         }
     }
-    private ArmPositions currentState;
+    private ArmPositions currentState = ArmPositions.INIT;
 
     private int deltaTicks = 0;
     public void setStartPosition(int pos){
@@ -63,7 +64,7 @@ public class Arm {
     }
 
     public boolean isArmBusy(){
-        return isBusy;
+        return isBusy && currentState != ArmPositions.MANUAL;
     }
 
     private int ticksOnLastUpdateCall = armPosition;
@@ -81,12 +82,12 @@ public class Arm {
                 lastArmTarget = armTarget;
             }
 
-            if(ticksOnLastUpdateCall == armPosition && timer.seconds() > 1.5){
+            if(ticksOnLastUpdateCall == armPosition && timer.seconds() > 1){
                 isBusy = false; // fix busy function to return false if arm not moving at all
                 timer.reset();
             }
 
-            if(Math.abs(armTarget - armPosition) > 20 && isBusy){
+            if(Math.abs(armTarget - armPosition) > 20 && (isBusy || currentState == ArmPositions.MANUAL)){
                 double pow = pid.update(armPosition, getApproximateAngle(), telemetry);
                 power = pow;
                 m_armMotor.setPower(pow);
@@ -103,18 +104,19 @@ public class Arm {
         ticksOnLastUpdateCall = armPosition;
     }
 
-    private void setArmTarget(int target){
+    public void setArmTarget(int target){
         if(armInManual){
             return;
         }
         armTarget = target;
+        currentState = ArmPositions.MANUAL;
     }
 
     public void setArmTarget(ArmPositions target){
         if(armInManual){
             return;
         }
-        setArmTarget(target.pos);
+        armTarget = target.pos;
         currentState = target;
     }
 

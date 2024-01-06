@@ -9,25 +9,27 @@ import org.firstinspires.ftc.teamcode.util.MiscActions;
 import org.firstinspires.ftc.teamcode.util.Robot;
 import org.firstinspires.ftc.teamcode.util.RobotTeleOpActions;
 
-@TeleOp(name = "V1 - untested", group = "teleop")
+@TeleOp(name = "TeleOp V1 - functional", group = "teleop")
 public class TeleV1RobotCentric extends LinearOpMode {
     Robot bot;
     Controller ctrl1, ctrl2;
 
     public void controller1Actions(){
         // DRIVE
-        if(ctrl1.isLeftTriggerDown()) {
+        if(ctrl1.bumperLeft.isDown()) {
             RobotTeleOpActions.drive(ctrl1, 0.3); // slow
 
-        } else if (ctrl1.isRightTriggerDown()){
-            RobotTeleOpActions.drive(ctrl1, 0.7); // fast
+        } /*else if (ctrl1.isRightTriggerDown()){
+            RobotTeleOpActions.drive(ctrl1, 1); // fast
 
-        } else {
-            RobotTeleOpActions.drive(ctrl1, 0.5); // normal
+        }*/ else {
+            RobotTeleOpActions.drive(ctrl1, 1); // normal
         }
 
         // PLANE
         RobotTeleOpActions.launchPlane(ctrl1.bumperRight.isPressed());
+        RobotTeleOpActions.hangingModeInit(ctrl1.dpadUp.isPressed());
+        RobotTeleOpActions.controlIntakeManually(ctrl1.leftTriggerButton, ctrl1.rightTriggerButton);
     }
 
     public void controller2Actions(){
@@ -40,19 +42,21 @@ public class TeleV1RobotCentric extends LinearOpMode {
             bot.lifter.goToPos(Lifter.LifterStates.HIGH);
         } else if (ctrl2.dpadDown.isPressed()){
             bot.lifter.goToPos(Lifter.LifterStates.DOWN);
+        } else if (ctrl2.dpadLeft.isPressed()){
+            bot.lifter.goToPos(Lifter.LifterStates.ULTRA_HIGH);
         }
-        RobotTeleOpActions.controlLifterManually(-ctrl2.leftStickX);
+        RobotTeleOpActions.controlLifterManually(-ctrl2.leftStickY);
+        RobotTeleOpActions.controlArmManually(ctrl2.rightStickY);
 
-        // COLLECTING/EJECTING/DROPPING PIXELS
-        // hope this works
-        RobotTeleOpActions.controlIntakeManually(ctrl2.bumperLeft, ctrl2.bumperRight);
+        if(ctrl2.square.isPressed()){
+            bot.intake.forceAngleServoPos(0.9);
+        }
     }
 
     public void hangingModeActions(){
-        RobotTeleOpActions.hangingModeInit(ctrl1.dpadUp.isPressed());
         RobotTeleOpActions.tryHang(ctrl1.dpadDown.isPressed());
         RobotTeleOpActions.cancelHanging(ctrl1.cross.isPressed());
-        RobotTeleOpActions.lifterHangingOverride(-ctrl2.rightStickX);
+        RobotTeleOpActions.lifterHangingOverride(-ctrl2.rightStickY);
 
         // PLANE ALSO WHILE HANGING
         RobotTeleOpActions.launchPlane(ctrl1.bumperRight.isPressed());
@@ -60,7 +64,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        bot = Robot.getRobotInstance(hardwareMap);
+        bot = new Robot(hardwareMap);
         bot.initTeleOp();
         bot.setTelemetry(telemetry);
         ctrl1 = new Controller(gamepad1);
@@ -76,17 +80,11 @@ public class TeleV1RobotCentric extends LinearOpMode {
             bot.update();
             telemetry.update();
 
-            Robot.RobotTeleOpStates botState = bot.getTeleOpState();
+            bot.lifter.printDebug(telemetry);
+            bot.arm.printDebug(telemetry);
 
-            if (botState == Robot.RobotTeleOpStates.RUNNING) {
-                controller1Actions();
-                controller2Actions();
-            } else if (botState == Robot.RobotTeleOpStates.HANGING_MODE) {
-                if (!bot.isHanged) {
-                    controller1Actions();
-                }
-                hangingModeActions();
-            }
+            controller1Actions();
+            controller2Actions();
         }
     }
 }
