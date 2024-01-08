@@ -31,19 +31,19 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
-        while(!isStopRequested() && !isStarted()){
+        while(!isStarted()){
             randomisationCase = husky.getRandomisationCase(3);
             telemetry.addData("CASE ", randomisationCase);
             telemetry.update();
         }
+
+        waitForStart();
 
         int randomization = (int) Math.round(Math.random() * 2) - 3;
 
         if(randomisationCase != HuskyLensDetection.RandomisationCase.UNKNOWN){
             randomization = randomisationCase.val;
         }
-
-        waitForStart();
 
 
         if (randomization == -1) { // STANGA RED
@@ -54,6 +54,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
             rightRed();
         }
     }
+
 
     public void leftRed(){ //TestCase1Red.java
         rr.followTrajectorySequenceAsync(
@@ -83,7 +84,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .lineToConstantHeading(new Vector2d(-9, 46.1))
+                        .lineToConstantHeading(new Vector2d(-10, 46.1))
                         .addSpatialMarker(new Vector2d(-12, 45.5), () -> {
                             lift.goToPos(1100);
                         })
@@ -99,7 +100,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
             lift.update();
         }
 
-        intake.forceAngleServoPos(0.8);
+        intake.forceAngleServoPos(0.75);
         arm.setArmTarget(Arm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -114,14 +115,17 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(20);
+        rr.followTrajectorySequence(
+                rr.trajectorySequenceBuilder(rr.getPoseEstimate()).forward(2).build()
+        );
+
+        lift.goToPos(Lifter.LifterStates.DOWN);
+        arm.forceArmToPosition(10);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
+            lift.update();
             telemetry.update();
         }
-        lift.goToPos(Lifter.LifterStates.DOWN);
         timer.reset();
         while(timer.seconds() < 2 && !isStopRequested()){
             lift.update();
@@ -133,7 +137,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeLeft(20)
+                        .strafeLeft(19)
                         .build()
         );
     }
@@ -167,9 +171,9 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .lineToConstantHeading(new Vector2d(-12, 46.1))
+                        .lineToConstantHeading(new Vector2d(-12.5, 46.1))
                         .addSpatialMarker(new Vector2d(-12, 45.5), () -> {
-                            lift.goToPos(1050);
+                            lift.goToPos(1100);
                         })
                         .build()
         );
@@ -184,7 +188,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
             lift.update();
         }
 
-        intake.forceAngleServoPos(0.8);
+        intake.forceAngleServoPos(0.75);
         arm.setArmTarget(Arm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -198,15 +202,17 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
+        rr.followTrajectorySequence(
+                rr.trajectorySequenceBuilder(rr.getPoseEstimate()).forward(2).build()
+        );
 
-        arm.forceArmToPosition(20);
+        arm.forceArmToPosition(10);
+        lift.goToPos(Lifter.LifterStates.DOWN);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
+            lift.update();
             telemetry.update();
         }
-        lift.goToPos(Lifter.LifterStates.DOWN);
         timer.reset();
         while(timer.seconds() < 2 && !isStopRequested()){
             lift.update();
@@ -218,7 +224,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeLeft(22)
+                        .strafeLeft(20)
                         .build()
         );
     }
@@ -252,7 +258,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .lineToConstantHeading(new Vector2d(-18, 46.1))
+                        .lineToConstantHeading(new Vector2d(-18.5, 46.1))
                         .addSpatialMarker(new Vector2d(-12, 45.5), () -> {
                             lift.goToPos(1050);
                         })
@@ -269,7 +275,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
             lift.update();
         }
 
-        intake.forceAngleServoPos(0.8);
+        intake.forceAngleServoPos(0.75);
         arm.setArmTarget(Arm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -283,15 +289,17 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
+        rr.followTrajectorySequence(
+                rr.trajectorySequenceBuilder(rr.getPoseEstimate()).forward(2).build()
+        );
 
-        arm.forceArmToPosition(20);
+        lift.goToPos(Lifter.LifterStates.DOWN);
+        arm.forceArmToPosition(10);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
+            lift.update();
             telemetry.update();
         }
-        lift.goToPos(Lifter.LifterStates.DOWN);
         timer.reset();
         while(timer.seconds() < 2 && !isStopRequested()){
             lift.update();
@@ -303,7 +311,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeLeft(26)
+                        .strafeLeft(25)
                         .build()
         );
     }

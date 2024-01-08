@@ -77,6 +77,6 @@ public class Camera {
     }
 
     public String getName(){
-        return  CAMERA_NAME;
+        return CAMERA_NAME;
     }
 }

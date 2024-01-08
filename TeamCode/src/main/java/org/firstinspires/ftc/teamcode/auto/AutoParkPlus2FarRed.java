@@ -31,20 +31,19 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
 
         HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
-        while(!isStopRequested() && !isStarted()){
+        while(!isStarted()){
             randomisationCase = husky.getRandomisationCase(2);
             telemetry.addData("CASE ", randomisationCase);
             telemetry.update();
         }
+
+        waitForStart();
 
         int randomization = (int) Math.round(Math.random() * 2) - 3;
 
         if(randomisationCase != HuskyLensDetection.RandomisationCase.UNKNOWN){
             randomization = randomisationCase.val;
         }
-
-        waitForStart();
-
 
         if (randomization == -1) { // STANGA RED
             leftRed();
@@ -81,15 +80,15 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         } catch (InterruptedException e){
             e.printStackTrace();
         }
-
+        sleep(4000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
                         .back(20)
                         .setTangent(0)
                         .splineToConstantHeading(new Vector2d(0, 79), Math.toRadians(90))
-                        .splineToConstantHeading(new Vector2d(-5.7, 100), Math.toRadians(90))
+                        .splineToConstantHeading(new Vector2d(-5.7, 100.3), Math.toRadians(90))
                         .addSpatialMarker(new Vector2d(-3, 90), () -> {
-                            lift.goToPos(1050);
+                            lift.goToPos(1100);
                         })
                         .build()
         );
@@ -106,7 +105,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
             lift.update();
         }
 
-        intake.forceAngleServoPos(0.8);
+        intake.forceAngleServoPos(0.75);
         arm.setArmTarget(Arm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -170,12 +169,12 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         } catch (InterruptedException e){
             e.printStackTrace();
         }
-
+        sleep(4000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(-52, 0, 0))
                         .forward(3)
                         .addSpatialMarker(new Vector2d(-30, 70), () -> {
-                            lift.goToPos(1050);
+                            lift.goToPos(1100);
                             arm.forceArmToPosition(1800);
                             intake.forceAngleServoPos(0.75);
                         })
@@ -183,7 +182,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
                         .back(10)
                         //.strafeRight(63, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(20))
                         .setTangent(Math.toRadians(90))
-                        .lineToLinearHeading(new Pose2d(-17.3, 100.7, Math.toRadians(-90)))
+                        .lineToLinearHeading(new Pose2d(-17.3, 101, Math.toRadians(-90)))
                         .build()
         );
 
@@ -265,18 +264,18 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         } catch (InterruptedException e){
             e.printStackTrace();
         }
-
+        sleep(4000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
                         .addSpatialMarker(new Vector2d(-30, 70), () -> {
-                            lift.goToPos(1050);
+                            lift.goToPos(1100);
                             arm.forceArmToPosition(1800);
                             intake.forceAngleServoPos(0.75);
                         })
                         .lineToLinearHeading(new Pose2d(-41, 60, Math.toRadians(-90)))
                         .back(10)
                         //.strafeRight(63, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(20))
-                        .lineToLinearHeading(new Pose2d(-21.1, 100.7, Math.toRadians(-90)))
+                        .lineToLinearHeading(new Pose2d(-21.1, 101, Math.toRadians(-90)))
                         .build()
         );
 

@@ -16,6 +16,8 @@ public class Intake {
         crs_leftGecko = hwmap.get(CRServo.class, HardwareConfig.CRS_LEFT);
         crs_rightGecko = hwmap.get(CRServo.class, HardwareConfig.CRS_RIGHT);
         s_angleAdjust = hwmap.get(Servo.class, HardwareConfig.ANGLE_ADJUST);
+        crs_leftGecko.setPower(0);
+        crs_rightGecko.setPower(0);
     }
 
     // ===================== CRS ======================

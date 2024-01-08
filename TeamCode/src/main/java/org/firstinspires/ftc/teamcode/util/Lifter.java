@@ -45,7 +45,7 @@ public class Lifter {
     }
 
     public enum LifterStates {
-        INIT(0), DOWN(10), MID(1000), HIGH(1500), ULTRA_HIGH(1900), HANG(600), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), DOWN(0), MID(1000), HIGH(1500), ULTRA_HIGH(1900), HANG(600), MANUAL(-1), NO_ENCODER(-2);
 
         public int pos;
         LifterStates(int pos){this.pos = pos;}

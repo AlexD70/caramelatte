@@ -77,10 +77,10 @@ public class RobotTeleOpActions {
         }
     }
 
-    public static double ARM_MANUAL_WEIGHT = 5, ARM_MANUAL_THRESH = 0.4;
+    public static double ARM_MANUAL_WEIGHT = 2, ARM_MANUAL_THRESH = 0.4;
     public static double deltaArm = 0;
     public static void controlArmManually(double movement){
-        if(bot.arm.isArmBusy()){
+        if(bot.arm.isArmBusy() || Math.abs(movement) < ARM_MANUAL_THRESH){
             deltaArm = 0;
             return;
         }

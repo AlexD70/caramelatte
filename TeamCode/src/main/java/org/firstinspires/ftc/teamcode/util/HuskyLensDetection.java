@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Rect;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class HuskyLensDetection {
 
     private int currentId = -1;
     private HuskyLens.Algorithm currentAlgo = HuskyLens.Algorithm.NONE;
+    private boolean algoSet = false;
     public RandomisationCase lastKnownCase = RandomisationCase.UNKNOWN;
     public static final int PIXEL_ID = -1, CUSTOM_ELEMENT_ID = 1;
 
@@ -23,6 +25,12 @@ public class HuskyLensDetection {
 
     public HuskyLensDetection(HardwareMap hwmap, String name){
         lens = hwmap.get(HuskyLens.class, name);
+        lens.close();
+        try {
+            Thread.sleep(200);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         lens.initialize();
     }
 
@@ -53,11 +61,13 @@ public class HuskyLensDetection {
         autoKnockThread.interrupt();
     }
 
-    public RandomisationCase getRandomisationCase(int id) {
+    public RandomisationCase getRandomisationCase(int id) throws InterruptedException {
         if (id == 0) { // blue far
             lens.selectAlgorithm(HuskyLens.Algorithm.OBJECT_TRACKING);
 
             HuskyLens.Block[] blocks = lens.blocks(1);
+
+            //telemetry.addData("blocks", blocks.length);
 
             if (blocks.length == 0) {
                 return lastKnownCase;
@@ -132,7 +142,8 @@ public class HuskyLensDetection {
             }
         }
 
-        return  lastKnownCase;
+        Thread.sleep(30);
+        return lastKnownCase;
     }
 
     @Nullable
