@@ -32,7 +32,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
         while(!isStarted()){
-            randomisationCase = husky.getRandomisationCase(2);
+            randomisationCase = husky.getCaseRedFar(telemetry);
             telemetry.addData("CASE ", randomisationCase);
             telemetry.update();
         }

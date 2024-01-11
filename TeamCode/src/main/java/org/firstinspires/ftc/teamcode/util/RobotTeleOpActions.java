@@ -42,7 +42,7 @@ public class RobotTeleOpActions {
     public static void toPlaceState(boolean button){
         if(button){
             bot.arm.setArmTarget(Arm.ArmPositions.PLACE);
-            bot.intake.forceAngleServoPos(0.75);
+            bot.intake.forceAngleServoPos(0.65);
         }
     }
 

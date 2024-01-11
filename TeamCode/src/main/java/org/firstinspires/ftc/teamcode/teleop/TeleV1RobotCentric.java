@@ -49,7 +49,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
         RobotTeleOpActions.controlArmManually(ctrl2.rightStickY);
 
         if(ctrl2.square.isPressed()){
-            bot.intake.forceAngleServoPos(0.9);
+            bot.intake.forceAngleServoPos(0.8);
         }
     }
 

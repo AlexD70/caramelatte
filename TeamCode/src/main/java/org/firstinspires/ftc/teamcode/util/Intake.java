@@ -88,7 +88,7 @@ public class Intake {
     // ====================== ANGLE ADJUST =====================
 
     public enum AngleAdjustStates {
-        INIT(0d), COLLECT_POS(0.5), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
+        INIT(0d), COLLECT_POS(0.3), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
 
         public double val;
         AngleAdjustStates(double val){this.val = val;}

@@ -32,7 +32,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
         while(!isStarted()){
-            randomisationCase = husky.getRandomisationCase(1);
+            randomisationCase = husky.getCaseBlueClose(telemetry);
             telemetry.addData("CASE ", randomisationCase);
             telemetry.update();
         }
