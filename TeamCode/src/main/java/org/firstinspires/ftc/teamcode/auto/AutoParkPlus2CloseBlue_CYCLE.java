@@ -124,6 +124,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
             telemetry.update();
         }
 
+        // aici incep ciclurile
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
                         .splineToConstantHeading(new Vector2d(6,-6),Math.toRadians(90))
@@ -200,6 +201,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
             arm.printDebug(telemetry);
             telemetry.update();
         }
+        // aici se termina primul ciclu
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -426,6 +428,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
             arm.printDebug(telemetry);
             telemetry.update();
         }
+        // aici dai copy paste
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
