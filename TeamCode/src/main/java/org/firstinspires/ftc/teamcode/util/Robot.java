@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -11,6 +12,7 @@ public class Robot {
     private static Robot robotInst = null;
     public MecanumDriveEx drive;
     public SampleMecanumDrive rr;
+    public SampleMecanumDrive drive2;
     //public final HuskyLensDetection husky;
     public final Arm arm;
     public final Lifter lifter;
@@ -74,10 +76,16 @@ public class Robot {
         RobotTeleOpActions.initActions(this);
     }
 
-    public void initAuto(HardwareMap hwmap){
+    public void initTeleOpV2(HardwareMap hwmap){
+        drive2 = new SampleMecanumDrive(hwmap);
+        arm.setArmTarget(Arm.ArmPositions.COLLECT);
+        RobotTeleOpActions.initActions(this);
+    }
+
+    public void initAuto(HardwareMap hwmap, LinearOpMode opmode, RobotAutoActions.Side side){
         rr = new SampleMecanumDrive(hwmap);
         arm.setArmTarget(Arm.ArmPositions.COLLECT);
-
+        RobotAutoActions.initAutoActions(this, side, opmode);
     }
 
     public void preserveMechanismPositions(){

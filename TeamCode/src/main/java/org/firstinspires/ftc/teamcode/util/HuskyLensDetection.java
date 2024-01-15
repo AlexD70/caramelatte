@@ -130,10 +130,10 @@ public class HuskyLensDetection {
                 return lastKnownCase;
             }
 
-            if (blocks[0].x > 100 && blocks[0].x + blocks[0].width < 180) {
+            if (blocks[0].x < 100 && blocks[0].x + blocks[0].width > 100) {
                 lastKnownCase = RandomisationCase.CENTER;
                 return RandomisationCase.CENTER;
-            } else if (blocks[0].x + blocks[0].width < 100) {
+            } else if (blocks[0].x + blocks[0].width > 240) {
                 lastKnownCase = RandomisationCase.RIGHT;
                 return RandomisationCase.RIGHT;
             } else if (blocks.length == 1) {
@@ -149,7 +149,7 @@ public class HuskyLensDetection {
     private RandomisationCase lastCase = RandomisationCase.UNKNOWN;
     private ElapsedTime timerBetweenDefaults = new ElapsedTime();
     private boolean firstCall = true;
-    private static final double AREA_THRESH_RED_MIN = 180, AREA_THRESH_RED_MAX = 600;
+    private static final double AREA_THRESH_RED_MIN = 180, AREA_THRESH_RED_MAX = 1000;
     public RandomisationCase getCaseRedFar(Telemetry telemetry) throws InterruptedException{
         if(firstCall){
             timerBetweenDefaults.reset();
@@ -164,11 +164,7 @@ public class HuskyLensDetection {
         double maxArea = 0;
         for(HuskyLens.Block b : blocks){
             double area = b.width * b.height / 2d;
-            if(area < AREA_THRESH_RED_MIN){
-                continue;
-            } else if (area > AREA_THRESH_RED_MAX){
-                continue;
-            } else if (area > maxArea){
+            if (area > maxArea){
                 maxArea = area;
                 target = b;
             }
@@ -179,7 +175,7 @@ public class HuskyLensDetection {
             if(target.x + target.width < 160){
                 telemetry.addLine("LEFT");
                 lastCase = RandomisationCase.LEFT;
-            } else if (target.x > 120 && target.width < 50){
+            } else if (target.x > 120 && target.x + target.width < 240){
                 telemetry.addLine("CENTER");
                 lastCase = RandomisationCase.CENTER;
             }
@@ -194,7 +190,7 @@ public class HuskyLensDetection {
         return lastCase;
     }
 
-    private static final double AREA_THRESH_RED_CLOSE_MIN = 180, AREA_THRESH_RED_CLOSE_MAX = 600;
+    private static final double AREA_THRESH_RED_CLOSE_MIN = 180, AREA_THRESH_RED_CLOSE_MAX = 1000;
     public RandomisationCase getCaseRedClose(Telemetry telemetry) throws InterruptedException{
         if(firstCall){
             timerBetweenDefaults.reset();
@@ -209,11 +205,7 @@ public class HuskyLensDetection {
         double maxArea = 0;
         for(HuskyLens.Block b : blocks){
             double area = b.width * b.height / 2d;
-            if(area < AREA_THRESH_RED_MIN){
-                continue;
-            } else if (area > AREA_THRESH_RED_MAX){
-                continue;
-            } else if (area > maxArea){
+            if (area > maxArea){
                 maxArea = area;
                 target = b;
             }
@@ -221,12 +213,14 @@ public class HuskyLensDetection {
 
         if(target != null){
             timerBetweenDefaults.reset();
-            if(target.x > 140){
+            if(target.x > 240){
                 telemetry.addLine("RIGHT");
                 lastCase = RandomisationCase.RIGHT;
-            } else if (target.x + target.width < 200){
+            } else if (target.x < 160 && target.x + target.width > 160){
                 telemetry.addLine("CENTER");
                 lastCase = RandomisationCase.CENTER;
+            } else {
+                lastCase = RandomisationCase.LEFT;
             }
         } else {
             if(timerBetweenDefaults.seconds() > 2.5){
@@ -239,7 +233,7 @@ public class HuskyLensDetection {
         return lastCase;
     }
 
-    private static final double AREA_THRESH_BLUE_MIN = 180, AREA_THRESH_BLUE_MAX = 600;
+    private static final double AREA_THRESH_BLUE_MIN = 180, AREA_THRESH_BLUE_MAX = 1000;
     public RandomisationCase getCaseBlueFar(Telemetry telemetry) throws InterruptedException{
         if(firstCall){
             timerBetweenDefaults.reset();
@@ -247,18 +241,14 @@ public class HuskyLensDetection {
         }
         Thread.sleep(50);
 
-        HuskyLens.Block[] blocks = lens.blocks(1);
+        HuskyLens.Block[] blocks = lens.blocks(3);
         telemetry.addData("LENGTH", blocks.length);
 
         HuskyLens.Block target = null;
         double maxArea = 0;
         for(HuskyLens.Block b : blocks){
             double area = b.width * b.height / 2d;
-            if(area < AREA_THRESH_BLUE_MIN){
-                continue;
-            } else if (area > AREA_THRESH_BLUE_MAX){
-                continue;
-            } else if (area > maxArea){
+            if (area > maxArea){
                 maxArea = area;
                 target = b;
             }
@@ -266,12 +256,15 @@ public class HuskyLensDetection {
 
         if(target != null){
             timerBetweenDefaults.reset();
-            if(target.x + target.width > 200){
+            if(target.x + target.width > 180){
                 telemetry.addLine("LEFT");
                 lastCase = RandomisationCase.LEFT;
-            } else if (target.x > 120 && target.x + target.width < 200){
+            } else if (target.x > 100 && target.x + target.width < 200){
                 telemetry.addLine("CENTER");
                 lastCase = RandomisationCase.CENTER;
+            } else if (target.x + target.width < 90){
+                telemetry.addLine("RIGHT");
+                lastCase = RandomisationCase.RIGHT;
             }
         } else {
             if(timerBetweenDefaults.seconds() > 2.5){
@@ -284,7 +277,7 @@ public class HuskyLensDetection {
         return lastCase;
     }
 
-    private static final double AREA_THRESH_BLUE_CLOSE_MIN = 180, AREA_THRESH_BLUE_CLOSE_MAX = 600;
+    private static final double AREA_THRESH_BLUE_CLOSE_MIN = 0, AREA_THRESH_BLUE_CLOSE_MAX = 1000;
     public RandomisationCase getCaseBlueClose(Telemetry telemetry) throws InterruptedException{
         if(firstCall){
             timerBetweenDefaults.reset();
@@ -292,18 +285,14 @@ public class HuskyLensDetection {
         }
         Thread.sleep(50);
 
-        HuskyLens.Block[] blocks = lens.blocks(1);
+        HuskyLens.Block[] blocks = lens.blocks(3);
         telemetry.addData("LENGTH", blocks.length);
 
         HuskyLens.Block target = null;
         double maxArea = 0;
         for(HuskyLens.Block b : blocks){
             double area = b.width * b.height / 2d;
-            if(area < AREA_THRESH_BLUE_CLOSE_MIN){
-                continue;
-            } else if (area > AREA_THRESH_BLUE_CLOSE_MAX){
-                continue;
-            } else if (area > maxArea){
+            if (area > maxArea){
                 maxArea = area;
                 target = b;
             }
@@ -314,7 +303,7 @@ public class HuskyLensDetection {
             if(target.x + target.width < 140){
                 telemetry.addLine("RIGHT");
                 lastCase = RandomisationCase.RIGHT;
-            } else if (target.x > 120 && target.x + target.width < 220){
+            } else if (target.x > 130 && target.x + target.width < 280){
                 telemetry.addLine("CENTER");
                 lastCase = RandomisationCase.CENTER;
             }

@@ -45,7 +45,7 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
             randomization = randomisationCase.val;
         }
 
-        if (randomization == -1) { // STANGA BLUE
+        if (randomization == 1) { // STANGA BLUE
             blueLeft();
         } else if (randomization == 0) { // CENTER BLUE
             centerBlue();
@@ -55,7 +55,7 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
 
     }
 
-    public void blueLeft(){ // TestCase1FarBlue.java
+    public void blueLeft() throws InterruptedException{ // TestCase1FarBlue.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -68,19 +68,11 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
         sleep(3000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -146,7 +138,7 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
 
     }
 
-    public void centerBlue(){ //TestCase2FarBlue.java
+    public void centerBlue() throws InterruptedException{ //TestCase2FarBlue.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -158,19 +150,11 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
         sleep(3000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(-52, 0, 0))
@@ -217,7 +201,7 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(-10);
+        arm.forceArmToPosition(0);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);
@@ -241,7 +225,7 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
         );
     }
 
-    public void rightBlue(){ //TestCase3FarBlue.java
+    public void rightBlue() throws InterruptedException{ //TestCase3FarBlue.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -253,19 +237,11 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
         sleep(3000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())

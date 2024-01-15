@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
@@ -45,7 +46,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
             randomization = randomisationCase.val;
         }
 
-        if (randomization == -1) { // STANGA RED
+        if (randomization == 1) { // STANGA RED
             leftRed();
         } else if (randomization == 0) { // CENTER RED
             centerRed();
@@ -54,7 +55,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         }
     }
 
-    public void leftRed(){ //TestCase1FarRed.java
+    public void leftRed() throws InterruptedException{ //TestCase1FarRed.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -67,19 +68,11 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
         sleep(4000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -144,7 +137,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         );
     }
 
-    public void centerRed() { //TestCase2FarRed.java
+    public void centerRed() throws InterruptedException { //TestCase2FarRed.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -156,19 +149,11 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
         sleep(4000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(-52, 0, 0))
@@ -215,7 +200,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(-10);
+        arm.forceArmToPosition(0);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);
@@ -239,7 +224,7 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
         );
     }
 
-    public void rightRed(){ // TestCase3FarRed.java
+    public void rightRed() throws InterruptedException{ // TestCase3FarRed.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -251,19 +236,11 @@ public class AutoParkPlus2FarRed extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
         sleep(4000);
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
