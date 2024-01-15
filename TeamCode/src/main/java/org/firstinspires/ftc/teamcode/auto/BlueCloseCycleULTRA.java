@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,9 +13,8 @@ import org.firstinspires.ftc.teamcode.util.HuskyLensDetection;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Lifter;
 
-@Disabled
-@Autonomous(name = "2+C+P CLOSE BLUE", group = "auto")
-public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
+@Autonomous(name = "1 CYCLE CLOSE BLUE ULTRA", group = "auto")
+public class BlueCloseCycleULTRA extends LinearOpMode {
     SampleMecanumDrive rr;
     Intake intake;
     Arm arm;
@@ -41,13 +39,13 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
 
         waitForStart();
 
-        int randomization = -1;//(int) Math.round(Math.random() * 2) - 3;
+        int randomization = (int) Math.round(Math.random() * 2) - 3;
 
         if(randomisationCase != HuskyLensDetection.RandomisationCase.UNKNOWN){
             randomization = randomisationCase.val;
         }
 
-        if (randomization == -1) { // STANGA BLUE
+        if (randomization == 1) { // STANGA BLUE
             blueLeft();
         } else if (randomization == 0) { // CENTER BLUE
             centerBlue();
@@ -124,11 +122,19 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
             telemetry.update();
         }
 
+        Pose2d poseEstimateBeforeCycle = rr.getPoseEstimate();
+
+        telemetry.setAutoClear(false);
+        telemetry.addData("X", poseEstimateBeforeCycle.getX());
+        telemetry.addData("Y", poseEstimateBeforeCycle.getY());
+        telemetry.addData("heading", poseEstimateBeforeCycle.getHeading());
+        telemetry.update();
+
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
                         .splineToConstantHeading(new Vector2d(6,-6),Math.toRadians(90))
                         .lineTo(new Vector2d(6,25))
-                        .addSpatialMarker(new Vector2d(-12, 42), () -> {
+                        .addSpatialMarker(new Vector2d(-12, 40), () -> {
                             intake.forceAngleServoPos(0.3);
                             intake.startCollect();
 //                            timer.reset();
@@ -208,7 +214,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
         );
     }
 
-    public void centerBlue() throws InterruptedException { //TestCase2.java
+    public void centerBlue() throws InterruptedException{ //TestCase2.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -222,15 +228,16 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
 
 
         intake.forceAngleServoPos(0.3);
-        Thread.sleep(500);
+
+        Thread.sleep(300);
         intake.dropPixel();
-        intake.forceAngleServoPos(0.75);
-        Thread.sleep(500);
+        intake.forceAngleServoPos(0.9);
+        Thread.sleep(300);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .lineToConstantHeading(new Vector2d(-14.5, -46.1))
-                        .addSpatialMarker(new Vector2d(-13.5, -45.5), () -> {
+                        .lineToConstantHeading(new Vector2d(-12, -46.1))
+                        .addSpatialMarker(new Vector2d(-12, -45.5), () -> {
                             lift.goToPos(1100);
                         })
                         .build()
@@ -250,7 +257,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
         arm.setArmTarget(Arm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while(timer.seconds() < 2 && !isStopRequested()){
+        while(timer.seconds() < 1.5 && !isStopRequested()){
             arm.update(telemetry);
             arm.printDebug(telemetry);
             lift.update();
@@ -259,7 +266,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
         }
 
         intake.dropPixel();
-        // intake.forceAngleServoPos(0.75);
+        intake.forceAngleServoPos(0.9);
 
         arm.forceArmToPosition(0);
         timer.reset();
@@ -270,7 +277,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
         }
         lift.goToPos(Lifter.LifterStates.DOWN);
         timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
+        while(timer.seconds() < 1 && !isStopRequested()){
             lift.update();
             arm.update(telemetry);
             lift.printDebug(telemetry);
@@ -278,38 +285,54 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
             telemetry.update();
         }
 
+//        rr.followTrajectorySequence(
+//                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
+//                        .strafeRight(22)
+//                        .build()
+//        );
+
+        // START CYCLES
         rr.followTrajectorySequence(
-                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        //.strafeRight(22)
-                        //.splineToConstantHeading(new Vector2d(-5,0),Math.toRadians(90))
-                        .lineToConstantHeading(new Vector2d(-15,59.1))
-                        .addSpatialMarker(new Vector2d(-15,30), () -> {
+                rr.trajectorySequenceBuilder(new Pose2d(-8.3, -46, 1.57))
+                        .splineToConstantHeading(new Vector2d(6,-6),Math.toRadians(90))
+                        .lineTo(new Vector2d(6,25))
+                        .addSpatialMarker(new Vector2d(-12, 42), () -> {
                             intake.forceAngleServoPos(0.3);
                             intake.startCollect();
+//                            timer.reset();
+
                         })
-                        .back(6.9)
-                        .forward(6.5)
+                        .splineToConstantHeading(new Vector2d(-15,59.4),Math.toRadians(90))
+                        .back(6.8)
+                        .forward(7.2)
                         .build()
         );
+//        while(timer.seconds() < 2 && !isStopRequested()){
+//            lift.update();
+//            arm.update(telemetry);
+//            lift.printDebug(telemetry);
+//            arm.printDebug(telemetry);
+//            telemetry.update();
+//        }
+        intake.stopCollect();
+        sleep(300);
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .lineToConstantHeading(new Vector2d(-15,-46.1))
-                        .addSpatialMarker(new Vector2d(-15,40), () -> {
-                            intake.stopCollect();
+                        .setReversed(true)
+                        .splineToConstantHeading(new Vector2d(6,38),Math.toRadians(-90))
+                        .lineTo(new Vector2d(6,-6))
+                        .splineToConstantHeading(new Vector2d(-9,-46.8),Math.toRadians(-90))
+                        .addSpatialMarker(new Vector2d(-5, -30), () -> {
                             intake.forceAngleServoPos(0.75);
-                        })
-                        .addSpatialMarker(new Vector2d(-15,-42), () -> {
                             lift.goToPos(1400);
                         })
                         .build()
         );
-
         while(rr.isBusy() && !isStopRequested()){
             rr.update();
             lift.update();
         }
-
 
         while(lift.isBusy() && !isStopRequested()){
             lift.update();
@@ -318,16 +341,16 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
         intake.forceAngleServoPos(0.75);
         arm.setArmTarget(Arm.ArmPositions.PLACE);
         timer.reset();
-        while(timer.seconds() < 2 && !isStopRequested()){
+        while(timer.seconds() < 1.5 && !isStopRequested()){
             arm.update(telemetry);
             arm.printDebug(telemetry);
             lift.update();
             lift.printDebug(telemetry);
             telemetry.update();
         }
-
         intake.dropPixel();
-        // intake.forceAngleServoPos(0.75);
+        intake.dropPixel();
+        intake.forceAngleServoPos(0.9);
 
         arm.forceArmToPosition(0);
         timer.reset();
@@ -346,6 +369,11 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
             telemetry.update();
         }
 
+        rr.followTrajectorySequence(
+                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
+                        .strafeRight(20)
+                        .build()
+        );
 
     }
 
@@ -363,18 +391,11 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
 
 
         intake.forceAngleServoPos(0.3);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        Thread.sleep(500);
         intake.dropPixel();
-        intake.forceAngleServoPos(0.75);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.9);
+        Thread.sleep(500);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -408,7 +429,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
         }
 
         intake.dropPixel();
-        //intake.forceAngleServoPos(0.75);
+        intake.forceAngleServoPos(0.9);
 
         arm.forceArmToPosition(0);
         timer.reset();
@@ -429,8 +450,7 @@ public class AutoParkPlus2CloseBlue_CYCLE extends LinearOpMode {
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        //.strafeRight(26)
-                        .splineToConstantHeading(new Vector2d(-5,0),Math.toRadians(90))
+                        .strafeRight(26)
                         .build()
         );
 

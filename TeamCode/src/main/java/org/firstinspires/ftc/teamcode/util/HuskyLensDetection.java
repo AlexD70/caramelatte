@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Rect;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HuskyLensDetection {
-    protected HuskyLens lens;
+    public HuskyLens lens;
 
     private int currentId = -1;
     private HuskyLens.Algorithm currentAlgo = HuskyLens.Algorithm.NONE;
@@ -25,13 +26,12 @@ public class HuskyLensDetection {
 
     public HuskyLensDetection(HardwareMap hwmap, String name){
         lens = hwmap.get(HuskyLens.class, name);
-        lens.close();
         try {
-            Thread.sleep(200);
+            Thread.sleep(3000);
         } catch (Exception e){
             e.printStackTrace();
         }
-        lens.initialize();
+        lens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
     }
 
     public static enum RandomisationCase {
@@ -130,10 +130,10 @@ public class HuskyLensDetection {
                 return lastKnownCase;
             }
 
-            if (blocks[0].x > 100 && blocks[0].x + blocks[0].width < 180) {
+            if (blocks[0].x < 100 && blocks[0].x + blocks[0].width > 100) {
                 lastKnownCase = RandomisationCase.CENTER;
                 return RandomisationCase.CENTER;
-            } else if (blocks[0].x + blocks[0].width < 100) {
+            } else if (blocks[0].x + blocks[0].width > 240) {
                 lastKnownCase = RandomisationCase.RIGHT;
                 return RandomisationCase.RIGHT;
             } else if (blocks.length == 1) {
@@ -145,6 +145,179 @@ public class HuskyLensDetection {
         Thread.sleep(30);
         return lastKnownCase;
     }
+
+    private RandomisationCase lastCase = RandomisationCase.UNKNOWN;
+    private ElapsedTime timerBetweenDefaults = new ElapsedTime();
+    private boolean firstCall = true;
+    private static final double AREA_THRESH_RED_MIN = 180, AREA_THRESH_RED_MAX = 1000;
+    public RandomisationCase getCaseRedFar(Telemetry telemetry) throws InterruptedException{
+        if(firstCall){
+            timerBetweenDefaults.reset();
+            firstCall = false;
+        }
+        Thread.sleep(50);
+
+        HuskyLens.Block[] blocks = lens.blocks(2);
+        telemetry.addData("LENGTH", blocks.length);
+
+        HuskyLens.Block target = null;
+        double maxArea = 0;
+        for(HuskyLens.Block b : blocks){
+            double area = b.width * b.height / 2d;
+            if (area > maxArea){
+                maxArea = area;
+                target = b;
+            }
+        }
+
+        if(target != null){
+            timerBetweenDefaults.reset();
+            if(target.x + target.width < 160){
+                telemetry.addLine("LEFT");
+                lastCase = RandomisationCase.LEFT;
+            } else if (target.x > 120 && target.x + target.width < 240){
+                telemetry.addLine("CENTER");
+                lastCase = RandomisationCase.CENTER;
+            }
+        } else {
+            if(timerBetweenDefaults.seconds() > 2.5){
+                telemetry.addLine("RIGHT");
+                lastCase = RandomisationCase.RIGHT;
+                timerBetweenDefaults.reset();
+            }
+        }
+
+        return lastCase;
+    }
+
+    private static final double AREA_THRESH_RED_CLOSE_MIN = 180, AREA_THRESH_RED_CLOSE_MAX = 1000;
+    public RandomisationCase getCaseRedClose(Telemetry telemetry) throws InterruptedException{
+        if(firstCall){
+            timerBetweenDefaults.reset();
+            firstCall = false;
+        }
+        Thread.sleep(50);
+
+        HuskyLens.Block[] blocks = lens.blocks(2);
+        telemetry.addData("LENGTH", blocks.length);
+
+        HuskyLens.Block target = null;
+        double maxArea = 0;
+        for(HuskyLens.Block b : blocks){
+            double area = b.width * b.height / 2d;
+            if (area > maxArea){
+                maxArea = area;
+                target = b;
+            }
+        }
+
+        if(target != null){
+            timerBetweenDefaults.reset();
+            if(target.x > 240){
+                telemetry.addLine("RIGHT");
+                lastCase = RandomisationCase.RIGHT;
+            } else if (target.x < 160 && target.x + target.width > 160){
+                telemetry.addLine("CENTER");
+                lastCase = RandomisationCase.CENTER;
+            } else {
+                lastCase = RandomisationCase.LEFT;
+            }
+        } else {
+            if(timerBetweenDefaults.seconds() > 2.5){
+                telemetry.addLine("LEFT");
+                lastCase = RandomisationCase.LEFT;
+                timerBetweenDefaults.reset();
+            }
+        }
+
+        return lastCase;
+    }
+
+    private static final double AREA_THRESH_BLUE_MIN = 180, AREA_THRESH_BLUE_MAX = 1000;
+    public RandomisationCase getCaseBlueFar(Telemetry telemetry) throws InterruptedException{
+        if(firstCall){
+            timerBetweenDefaults.reset();
+            firstCall = false;
+        }
+        Thread.sleep(50);
+
+        HuskyLens.Block[] blocks = lens.blocks(3);
+        telemetry.addData("LENGTH", blocks.length);
+
+        HuskyLens.Block target = null;
+        double maxArea = 0;
+        for(HuskyLens.Block b : blocks){
+            double area = b.width * b.height / 2d;
+            if (area > maxArea){
+                maxArea = area;
+                target = b;
+            }
+        }
+
+        if(target != null){
+            timerBetweenDefaults.reset();
+            if(target.x + target.width > 180){
+                telemetry.addLine("LEFT");
+                lastCase = RandomisationCase.LEFT;
+            } else if (target.x > 100 && target.x + target.width < 200){
+                telemetry.addLine("CENTER");
+                lastCase = RandomisationCase.CENTER;
+            } else if (target.x + target.width < 90){
+                telemetry.addLine("RIGHT");
+                lastCase = RandomisationCase.RIGHT;
+            }
+        } else {
+            if(timerBetweenDefaults.seconds() > 2.5){
+                telemetry.addLine("RIGHT");
+                lastCase = RandomisationCase.RIGHT;
+                timerBetweenDefaults.reset();
+            }
+        }
+
+        return lastCase;
+    }
+
+    private static final double AREA_THRESH_BLUE_CLOSE_MIN = 0, AREA_THRESH_BLUE_CLOSE_MAX = 1000;
+    public RandomisationCase getCaseBlueClose(Telemetry telemetry) throws InterruptedException{
+        if(firstCall){
+            timerBetweenDefaults.reset();
+            firstCall = false;
+        }
+        Thread.sleep(50);
+
+        HuskyLens.Block[] blocks = lens.blocks(3);
+        telemetry.addData("LENGTH", blocks.length);
+
+        HuskyLens.Block target = null;
+        double maxArea = 0;
+        for(HuskyLens.Block b : blocks){
+            double area = b.width * b.height / 2d;
+            if (area > maxArea){
+                maxArea = area;
+                target = b;
+            }
+        }
+
+        if(target != null){
+            timerBetweenDefaults.reset();
+            if(target.x + target.width < 140){
+                telemetry.addLine("RIGHT");
+                lastCase = RandomisationCase.RIGHT;
+            } else if (target.x > 130 && target.x + target.width < 280){
+                telemetry.addLine("CENTER");
+                lastCase = RandomisationCase.CENTER;
+            }
+        } else {
+            if(timerBetweenDefaults.seconds() > 2.5){
+                telemetry.addLine("LEFT");
+                lastCase = RandomisationCase.LEFT;
+                timerBetweenDefaults.reset();
+            }
+        }
+
+        return lastCase;
+    }
+
 
     @Nullable
     public ArrayList<Rect> getBackdropTags(){

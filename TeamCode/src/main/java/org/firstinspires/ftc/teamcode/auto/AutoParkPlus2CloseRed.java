@@ -32,7 +32,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
         while(!isStarted()){
-            randomisationCase = husky.getRandomisationCase(3);
+            randomisationCase = husky.getCaseRedClose(telemetry);
             telemetry.addData("CASE ", randomisationCase);
             telemetry.update();
         }
@@ -46,7 +46,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         }
 
 
-        if (randomization == -1) { // STANGA RED
+        if (randomization == 1) { // STANGA RED
             leftRed();
         } else if (randomization == 0) { // CENTER RED
             centerRed();
@@ -56,7 +56,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
     }
 
 
-    public void leftRed(){ //TestCase1Red.java
+    public void leftRed() throws InterruptedException{ //TestCase1Red.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -68,19 +68,11 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.55);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -120,7 +112,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         );
 
         lift.goToPos(Lifter.LifterStates.DOWN);
-        arm.forceArmToPosition(10);
+        arm.forceArmToPosition(0);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             lift.update();
@@ -142,7 +134,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         );
     }
 
-    public void centerRed() { //TestCase2Red.java
+    public void centerRed() throws InterruptedException { //TestCase2Red.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -155,19 +147,11 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         }
 
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -206,7 +190,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate()).forward(2).build()
         );
 
-        arm.forceArmToPosition(10);
+        arm.forceArmToPosition(0);
         lift.goToPos(Lifter.LifterStates.DOWN);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
@@ -229,7 +213,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         );
     }
 
-    public void rightRed(){ // TestCase3Red.java
+    public void rightRed() throws InterruptedException { // TestCase3Red.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -242,19 +226,11 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         }
 
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -294,7 +270,7 @@ public class AutoParkPlus2CloseRed extends LinearOpMode {
         );
 
         lift.goToPos(Lifter.LifterStates.DOWN);
-        arm.forceArmToPosition(10);
+        arm.forceArmToPosition(0);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             lift.update();

@@ -32,7 +32,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
         while(!isStarted()){
-            randomisationCase = husky.getRandomisationCase(1);
+            randomisationCase = husky.getCaseBlueClose(telemetry);
             telemetry.addData("CASE ", randomisationCase);
             telemetry.update();
         }
@@ -45,7 +45,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
             randomization = randomisationCase.val;
         }
 
-        if (randomization == -1) { // STANGA BLUE
+        if (randomization == 1) { // STANGA BLUE
             blueLeft();
         } else if (randomization == 0) { // CENTER BLUE
             centerBlue();
@@ -55,7 +55,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
     }
 
 
-    public void blueLeft(){ // TestAxes.java
+    public void blueLeft() throws InterruptedException{ // TestAxes.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -67,19 +67,11 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
             rr.update();
         }
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -114,7 +106,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(-10);
+        arm.forceArmToPosition(0);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);
@@ -138,7 +130,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         );
     }
 
-    public void centerBlue(){ //TestCase2.java
+    public void centerBlue() throws InterruptedException{ //TestCase2.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -151,19 +143,12 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         }
 
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -199,7 +184,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(-10);
+        arm.forceArmToPosition(0);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);
@@ -224,7 +209,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
 
     }
 
-    public void rightBlue(){ //TestCase2.java
+    public void rightBlue() throws InterruptedException{ //TestCase2.java
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
@@ -237,19 +222,12 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         }
 
 
-        intake.forceAngleServoPos(0.5);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        intake.forceAngleServoPos(0.3);
+
+        Thread.sleep(500);
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
-        try{
-            Thread.sleep(500);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
+        Thread.sleep(500);
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
@@ -285,7 +263,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(-10);
+        arm.forceArmToPosition(0);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);
