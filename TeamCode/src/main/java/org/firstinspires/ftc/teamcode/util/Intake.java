@@ -42,6 +42,16 @@ public class Intake {
         setCRSPowers(0);
     }
 
+    public void startCollectFast(){
+        interruptCRSScheduler();
+        setCRSPowers(.9);
+    }
+
+    public void startEjectFast(){
+        interruptCRSScheduler();
+        setCRSPowers(-0.75);
+    }
+
     public void dropBothPixels() {
         interruptCRSScheduler();
         crsSchedulerThread = new Thread(() -> {
@@ -59,21 +69,11 @@ public class Intake {
         crsSchedulerThread.start();
     }
 
-    public void dropPixel() {
+    public void dropPixel() throws InterruptedException{
         interruptCRSScheduler();
-        crsSchedulerThread = new Thread(() -> {
-            setCRSPowers(-0.5);
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            setCRSPowers(0);
-        });
-
-        crsSchedulerThread.run();
+        setCRSPowers(-0.5);
+        Thread.sleep(500);
+        setCRSPowers(0);
     }
 
     public void interruptCRSScheduler() {
@@ -88,7 +88,7 @@ public class Intake {
     // ====================== ANGLE ADJUST =====================
 
     public enum AngleAdjustStates {
-        INIT(0d), COLLECT_POS(0.5), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
+        INIT(0d), COLLECT_POS(0.3), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
 
         public double val;
         AngleAdjustStates(double val){this.val = val;}
