@@ -297,7 +297,9 @@ public class BlueCloseCycle extends LinearOpMode {
 //                            timer.reset();
 
                         })
-                        .splineToConstantHeading(new Vector2d(-16,59.4),Math.toRadians(90))
+                        .splineToConstantHeading(new Vector2d(-16,60),Math.toRadians(90),
+                                new TranslationalVelocityConstraint(30),
+                                new ProfileAccelerationConstraint(10))
                         .back(6.5)
                         .forward(6.9)
                         .build()
@@ -370,7 +372,7 @@ public class BlueCloseCycle extends LinearOpMode {
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
-                        .lineToLinearHeading(new Pose2d(-20, -13.5, Math.toRadians(90)))
+                        .lineToLinearHeading(new Pose2d(-25, -12, Math.toRadians(90)))
                         .build()
         );
 
@@ -388,7 +390,7 @@ public class BlueCloseCycle extends LinearOpMode {
 
         rr.followTrajectorySequenceAsync(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .lineToConstantHeading(new Vector2d(-18, -45.4))
+                        .lineToConstantHeading(new Vector2d(-20, -45.4))
                         .addSpatialMarker(new Vector2d(-12, -45.5), () -> {
                             lift.goToPos(1100);
                         })
@@ -409,7 +411,7 @@ public class BlueCloseCycle extends LinearOpMode {
         arm.setArmTarget(Arm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while(timer.seconds() < 3 && !isStopRequested()){
+        while(timer.seconds() < 1.5 && !isStopRequested()){
             arm.update(telemetry);
             arm.printDebug(telemetry);
             lift.update();
@@ -429,7 +431,7 @@ public class BlueCloseCycle extends LinearOpMode {
         }
         lift.goToPos(Lifter.LifterStates.DOWN);
         timer.reset();
-        while(timer.seconds() < 3 && !isStopRequested()){
+        while(timer.seconds() < 1.5 && !isStopRequested()){
             lift.update();
             arm.update(telemetry);
             lift.printDebug(telemetry);
@@ -437,11 +439,93 @@ public class BlueCloseCycle extends LinearOpMode {
             telemetry.update();
         }
 
+//        rr.followTrajectorySequence(
+//                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
+//                        .strafeRight(26)
+//                        .build()
+//        );
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeRight(26)
+                        .splineToConstantHeading(new Vector2d(-40,-6),Math.toRadians(90))
+                        .addSpatialMarker(new Vector2d(-40, 42), () -> {
+                            intake.forceAngleServoPos(0.3);
+                            intake.startCollect();
+//                            timer.reset();
+
+                        })
+                        .lineTo(new Vector2d(-44.5,55))
+                        .lineTo(new Vector2d(-44.5,62),//60
+                                new TranslationalVelocityConstraint(30),
+                                new ProfileAccelerationConstraint(15))//10
+//                        .splineToConstantHeading(new Vector2d(-25,60),Math.toRadians(90),
+//                                new TranslationalVelocityConstraint(30),
+//                                new ProfileAccelerationConstraint(10))
+                        .back(6.5)
+                        .forward(6.9)
                         .build()
         );
+//        while(timer.seconds() < 2 && !isStopRequested()){
+//            lift.update();
+//            arm.update(telemetry);
+//            lift.printDebug(telemetry);
+//            arm.printDebug(telemetry);
+//            telemetry.update();
+//        }
+        intake.stopCollect();
+
+        rr.followTrajectorySequence(
+                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
+                        .setReversed(true)
+//                        .splineToConstantHeading(new Vector2d(-25,38),Math.toRadians(-90))
+                        .lineTo(new Vector2d(-40,-6))
+                        .splineToConstantHeading(new Vector2d(-9,-46.8),Math.toRadians(-90))
+                        .addSpatialMarker(new Vector2d(-5, -30), () -> {
+                            intake.forceAngleServoPos(0.75);
+                            lift.goToPos(1400);
+                        })
+                        .build()
+        );
+        while(rr.isBusy() && !isStopRequested()){
+            rr.update();
+            lift.update();
+        }
+
+        while(lift.isBusy() && !isStopRequested()){
+            lift.update();
+        }
+
+        intake.forceAngleServoPos(0.75);
+        arm.setArmTarget(Arm.ArmPositions.PLACE);
+        timer.reset();
+        while(timer.seconds() < 1.5 && !isStopRequested()){
+            arm.update(telemetry);
+            arm.printDebug(telemetry);
+            lift.update();
+            lift.printDebug(telemetry);
+            telemetry.update();
+        }
+        intake.dropPixel();
+        sleep(500);
+        intake.dropPixel();
+        intake.forceAngleServoPos(0.9);
+
+        arm.forceArmToPosition(10);
+        timer.reset();
+        while(timer.seconds() < 1 && !isStopRequested()){
+            arm.update(telemetry);
+            arm.printDebug(telemetry);
+            telemetry.update();
+        }
+        lift.goToPos(Lifter.LifterStates.DOWN);
+        timer.reset();
+        while(timer.seconds() < 1.5 && !isStopRequested()){
+            lift.update();
+            arm.update(telemetry);
+            lift.printDebug(telemetry);
+            arm.printDebug(telemetry);
+            telemetry.update();
+        }
+
 
     }
 }
