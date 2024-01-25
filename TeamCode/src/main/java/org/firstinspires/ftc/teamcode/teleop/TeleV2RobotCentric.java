@@ -30,7 +30,7 @@ public class TeleV2RobotCentric extends LinearOpMode {
         RobotTeleOpActions.launchPlane(ctrl1.bumperRight.isPressed());
         RobotTeleOpActions.hangingModeInit(ctrl1.dpadUp.isPressed());
         if(ctrl1.dpadDown.isPressed()){
-            RobotTeleOpActions.hangRobot();
+//            RobotTeleOpActions.hangRobot();
         }
         if(ctrl1.square.isPressed()){
             RobotTeleOpActions.driveToPlaneLaunchZone();

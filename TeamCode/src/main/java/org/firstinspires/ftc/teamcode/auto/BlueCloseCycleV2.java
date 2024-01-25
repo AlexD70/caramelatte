@@ -11,23 +11,55 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.Arm;
+import org.firstinspires.ftc.teamcode.util.BluePipeline;
 import org.firstinspires.ftc.teamcode.util.HuskyLensDetection;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Lifter;
 import org.firstinspires.ftc.teamcode.util.VoltageScaledArm;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "1 CYCLE CLOSE BLUE", group = "auto")
-public class BlueCloseCycle extends LinearOpMode {
+@Autonomous(name = "1 CYCLE CLOSE BLUE V2", group = "auto")
+public class BlueCloseCycleV2 extends LinearOpMode {
     SampleMecanumDrive rr;
     Intake intake;
     VoltageScaledArm arm;
     Lifter lift;
-    HuskyLensDetection husky;
     ColorSensor sensor;
-    TrajectorySequence toSpikeMark, toBackdrop, toStack, toBackdrop2;
+    OpenCvWebcam webcam;
+    BluePipeline pipeline = new BluePipeline();
+    boolean cameraOK = true;
+
+    private void initDetection() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
+
+        webcam.setMillisecondsPermissionTimeout(3000); //3000
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                try {
+                    Thread.sleep(1000); // always wait before pressing start
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                webcam.setPipeline(pipeline);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                telemetry.addData("camera failed to open:", errorCode);
+                telemetry.update();
+                cameraOK = false;
+            }
+        });
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -35,74 +67,45 @@ public class BlueCloseCycle extends LinearOpMode {
         intake = new Intake(hardwareMap);
         arm = new VoltageScaledArm(hardwareMap);
         lift = new Lifter(hardwareMap);
-        husky = new HuskyLensDetection(hardwareMap, "husky");
         sensor = hardwareMap.get(ColorSensor.class, "sensor");
 
-        HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
+        initDetection();
 
+        pipeline.startDetection(true);
 
-        toSpikeMark =
-                rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
-                        .setReversed(true)
-                        .splineToLinearHeading(new Pose2d(-20, -33, Math.toRadians(90)), Math.toRadians(-90))
-                        .build();
+        if (cameraOK) {
+            telemetry.addLine("Webcam Ok");
 
-        toBackdrop =
-                rr.trajectorySequenceBuilder(toSpikeMark.end())
-                        .lineToConstantHeading(new Vector2d(-9, -46.1))
-                        .addSpatialMarker(new Vector2d(-12, -45.5), () -> {
-                            lift.goToPos(1100);
-                            arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
-                            intake.forceAngleServoPos(0.75);
-                        })
-                        .build();
-
-        toStack = rr.trajectorySequenceBuilder(toBackdrop.end())
-                .splineToConstantHeading(new Vector2d(6, -6),Math.toRadians(90))
-                .lineTo(new Vector2d(6, 27))
-                .addSpatialMarker(new Vector2d(-12, 42), () -> {
-                    intake.forceAngleServoPos(0.3);
-                    intake.startCollect();
-                })
-                .splineToConstantHeading(new Vector2d(-16, 52),Math.toRadians(90))
-                .forward(7, new TranslationalVelocityConstraint(20), new ProfileAccelerationConstraint(10))
-                .back(7)
-                .forward(7, new TranslationalVelocityConstraint(10), new ProfileAccelerationConstraint(10))
-                .build();
-
-        toBackdrop2 =
-                rr.trajectorySequenceBuilder(toStack.end())
-                        .setReversed(true)
-                        .splineToConstantHeading(new Vector2d(5, 38),Math.toRadians(-90))
-                        .addTemporalMarker(1, () -> {
-                            intake.forceAngleServoPos(0.9);
-                        })
-                        .lineTo(new Vector2d(5, -6))
-                        .splineToConstantHeading(new Vector2d(-9.5, -46.4), Math.toRadians(-90))
-                        .build();
-
-        while(!isStarted()){
-            randomisationCase = husky.getCaseBlueClose(telemetry);
-            telemetry.addData("CASE ", randomisationCase);
+            telemetry.addLine("Ready! Press Play");
+        } else {
+            telemetry.addLine("Webcam failed, please RESTART!");
             telemetry.update();
+            sleep(1000);
+        }
+
+        while(opModeInInit()){
+            telemetry.addData("case", pipeline.whichCase);
         }
 
         waitForStart();
         sensor.enableLed(false);
 
+        pipeline.killThis();
+        webcam.stopStreaming();
+        webcam.closeCameraDevice();
+
         int randomization = (int) Math.round(Math.random() * 2) - 3;
 
-        if(randomisationCase != HuskyLensDetection.RandomisationCase.UNKNOWN){
-            randomization = randomisationCase.val;
+        if(pipeline.whichCase != -2){
+            randomization = pipeline.whichCase;
         }
 
-        blueLeftRR();
         if (randomization == 1) { // STANGA BLUE
-//            blueLeft();
+            blueLeft();
         } else if (randomization == 0) { // CENTER BLUE
-//            centerBlue();
+            centerBlue();
         } else { // DREAPTA BLUE
-//            rightBluePreload();
+            rightBluePreload();
         }
     }
 
@@ -280,26 +283,27 @@ public class BlueCloseCycle extends LinearOpMode {
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
                         .setReversed(true)
                         .splineToConstantHeading(new Vector2d(5, 38),Math.toRadians(-90))
-                        .addTemporalMarker(1, () -> {
+                        .addDisplacementMarker(3, () -> {
                             intake.forceAngleServoPos(0.9);
                         })
                         .lineTo(new Vector2d(5, -6))
                         .splineToConstantHeading(new Vector2d(-9, -45.8), Math.toRadians(-90))
+                        .addSpatialMarker(new Vector2d(-5, -30), () -> {
+                            lift.goToPos(1300);
+                        })
+                        .addSpatialMarker(new Vector2d(-7, -40), () -> {
+                            arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
+                        })
                         .build()
         );
-
         while(rr.isBusy() && !isStopRequested()){
             rr.update();
             lift.update();
             arm.update(telemetry);
         }
-
         intake.forceAngleServoPos(0.75);
-        lift.goToPos(Lifter.LifterStates.HIGH);
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
 
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
+        while(lift.isBusy() && !isStopRequested()){
             lift.update();
             arm.update(telemetry);
             lift.printDebug(telemetry);
@@ -314,127 +318,8 @@ public class BlueCloseCycle extends LinearOpMode {
         }
 
         intake.dropPixel();
-        sleep(200);
-        intake.forceAngleServoPos(0.9);
-
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
-        timer.reset();
-        while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-        lift.goToPos(Lifter.LifterStates.DOWN);
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-
-        rr.followTrajectorySequence(
-                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeRight(20)
-                        .build()
-        );
-    }
-
-    // start trajectories
-
-
-
-    public void blueLeftRR() throws InterruptedException { // TestAxes.java
-
-        rr.followTrajectorySequenceAsync(toSpikeMark);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-        }
-
-        intake.forceAngleServoPos(0.3);
-        Thread.sleep(250);
+        sleep(500);
         intake.dropPixel();
-        intake.forceAngleServoPos(0.75);
-        Thread.sleep(200);
-
-        rr.followTrajectorySequenceAsync(toBackdrop);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-            lift.update();
-            arm.update(telemetry);
-        }
-
-        while(arm.isArmBusy() && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        ElapsedTime timer = new ElapsedTime();
-        sleep(200);
-
-        intake.dropPixel();
-        //  intake.forceAngleServoPos(0.75);
-        timer.reset();
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
-        while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-        lift.goToPos(Lifter.LifterStates.DOWN);
-        timer.reset();
-        while(timer.seconds() < 0.6 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-
-        rr.followTrajectorySequence(toStack);
-//        while(timer.seconds() < 2 && !isStopRequested()){
-//            lift.update();
-//            arm.update(telemetry);
-//            lift.printDebug(telemetry);
-//            arm.printDebug(telemetry);
-//            telemetry.update();
-//        }
-        intake.stopCollect();
-//        lift.stopKeepDown();
-
-        rr.followTrajectorySequence(toBackdrop2);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-            lift.update();
-            arm.update(telemetry);
-        }
-
-        intake.forceAngleServoPos(0.75);
-        lift.goToPos(Lifter.LifterStates.HIGH);
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
-
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        while(arm.isArmBusy() && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        intake.dropPixel();
-        sleep(200);
         intake.forceAngleServoPos(0.9);
 
         arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);

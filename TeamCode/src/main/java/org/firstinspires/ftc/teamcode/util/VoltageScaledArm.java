@@ -17,7 +17,7 @@ public class VoltageScaledArm {
     protected DcMotorEx m_armMotor;
 
     private int armPosition = 0, armTarget = 0, lastArmTarget = 0;
-    private final double kP = 0.004, kD = 0.0008, kI = 0, kCos = 0.016;
+    private final double kP = 0.00469, kD = 0.0008, kI = 0, kCos = 0.016;
     private VoltageScaledCosPID pid = null;
     private boolean armInManual = false, isBusy = false; // manual actually means dont use encoders
     private double manualArmPower = 0, power = 0;
@@ -122,6 +122,7 @@ public class VoltageScaledArm {
         currentState = target;
     }
 
+    @Deprecated
     public void forceArmToPosition(int position){
         setArmTarget(position);
         currentState = ArmPositions.MANUAL;

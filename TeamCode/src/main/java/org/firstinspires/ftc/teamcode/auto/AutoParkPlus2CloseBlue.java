@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
@@ -12,22 +13,25 @@ import org.firstinspires.ftc.teamcode.util.Arm;
 import org.firstinspires.ftc.teamcode.util.HuskyLensDetection;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Lifter;
+import org.firstinspires.ftc.teamcode.util.VoltageScaledArm;
 
 @Autonomous(name = "2+P CLOSE BLUE", group = "auto")
 public class AutoParkPlus2CloseBlue extends LinearOpMode {
     SampleMecanumDrive rr;
     Intake intake;
-    Arm arm;
+    VoltageScaledArm arm;
     Lifter lift;
     HuskyLensDetection husky;
+    ColorSensor sensor;
 
     @Override
     public void runOpMode() throws InterruptedException {
         rr = new SampleMecanumDrive(hardwareMap);
         intake = new Intake(hardwareMap);
-        arm = new Arm(hardwareMap);
+        arm = new VoltageScaledArm(hardwareMap);
         lift = new Lifter(hardwareMap);
         husky = new HuskyLensDetection(hardwareMap, "husky");
+        sensor = hardwareMap.get(ColorSensor.class, "sensor");
 
         HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
@@ -38,6 +42,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         }
 
         waitForStart();
+        sensor.enableLed(false);
 
         int randomization = (int) Math.round(Math.random() * 2) - 3;
 
@@ -92,7 +97,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         }
 
         intake.forceAngleServoPos(0.75);
-        arm.setArmTarget(Arm.ArmPositions.PLACE);
+        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while(timer.seconds() < 3 && !isStopRequested()){
@@ -106,7 +111,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(0);
+        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);
@@ -170,7 +175,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         }
 
         intake.forceAngleServoPos(0.75);
-        arm.setArmTarget(Arm.ArmPositions.PLACE);
+        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while(timer.seconds() < 3 && !isStopRequested()){
@@ -184,7 +189,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(0);
+        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);
@@ -249,7 +254,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         }
 
         intake.forceAngleServoPos(0.75);
-        arm.setArmTarget(Arm.ArmPositions.PLACE);
+        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while(timer.seconds() < 3 && !isStopRequested()){
@@ -263,7 +268,7 @@ public class AutoParkPlus2CloseBlue extends LinearOpMode {
         intake.dropPixel();
         intake.forceAngleServoPos(0.9);
 
-        arm.forceArmToPosition(0);
+        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
         timer.reset();
         while(timer.seconds() < 1 && !isStopRequested()){
             arm.update(telemetry);

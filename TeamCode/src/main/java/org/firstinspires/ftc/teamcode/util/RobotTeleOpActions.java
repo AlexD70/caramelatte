@@ -14,6 +14,7 @@ public class RobotTeleOpActions {
     public static Robot bot;
     public static ElapsedTime timer = new ElapsedTime();
     public static boolean isInHangingMode = false;
+    public static boolean isLimited = true;
 
     public static void initActions(){
         bot = Robot.getRobotInstance(null);
@@ -107,6 +108,12 @@ public class RobotTeleOpActions {
         }
     }
 
+    public static void overrideLimits(boolean button){
+        if(button){
+            isLimited = false;
+        }
+    }
+
     public static int lifterInManual = 0, lifterInitial = 0;
     public static void controlLifterManually2(double movement){
         if(bot.lifter.isBusy()){
@@ -121,7 +128,11 @@ public class RobotTeleOpActions {
                 lifterInitial = bot.lifter.getPos();
             }
             deltaLifter += movement * LIFTER_MANUAL_WEIGHT;
-            bot.lifter.goToPos(Range.clip((int) (lifterInitial + deltaLifter), 0, 2200));
+            if(isLimited) {
+                bot.lifter.goToPos(Range.clip((int) (lifterInitial + deltaLifter), 0, 2200));
+            } else {
+                bot.lifter.goToPos((int)(lifterInitial + deltaLifter));
+            }
         } else {
             lifterInManual = 0;
             deltaLifter = 0;
@@ -142,7 +153,11 @@ public class RobotTeleOpActions {
                 armInitial = bot.arm.getArmPosition();
             }
             deltaArm += movement * ARM_MANUAL_WEIGHT;
-            bot.arm.setArmTarget(Range.clip((int)(armInitial + deltaArm), -10, 1900));
+            if (isLimited) {
+                bot.arm.setArmTarget(Range.clip((int) (armInitial + deltaArm), -10, 1900));
+            } else {
+                bot.arm.setArmTarget((int)(armInitial + deltaArm));
+            }
         } else {
             armInManual = 0;
             deltaArm = 0;
