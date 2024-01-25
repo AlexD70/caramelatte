@@ -87,11 +87,11 @@ public class Arm {
                 timer.reset();
             }
 
-            if(Math.abs(armTarget - armPosition) > 20 && (isBusy || currentState == ArmPositions.MANUAL)){
+            if(Math.abs(armTarget - armPosition) > 10 && (isBusy || currentState == ArmPositions.MANUAL)){
                 double pow = pid.update(armPosition, getApproximateAngle(), telemetry);
                 power = pow;
                 m_armMotor.setPower(pow);
-            } else if (Math.abs(armTarget - armPosition) < 20){
+            } else if (Math.abs(armTarget - armPosition) < 10){
                 isBusy = false;
                 power = 0;
                 m_armMotor.setPower(0);
