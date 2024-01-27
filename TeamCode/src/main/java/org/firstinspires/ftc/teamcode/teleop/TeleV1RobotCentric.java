@@ -17,7 +17,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
     public void controller1Actions(){
         // DRIVE
         if(ctrl1.bumperLeft.isDown()) {
-            RobotTeleOpActions.drive(ctrl1, 0.3); // slow
+            RobotTeleOpActions.drive(ctrl1, 0.2); // slow
 
         } /*else if (ctrl1.isRightTriggerDown()){
             RobotTeleOpActions.drive(ctrl1, 1); // fast
@@ -51,6 +51,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
         }
         RobotTeleOpActions.controlLifterManually2(-ctrl2.leftStickY);
         RobotTeleOpActions.controlArmManually2(ctrl2.rightStickY);
+        RobotTeleOpActions.overrideLimits(ctrl2.share.isPressed());
 
         if(ctrl2.square.isPressed()){
             bot.intake.forceAngleServoPos(0.8);
@@ -69,7 +70,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         bot = new Robot(hardwareMap);
-        bot.initTeleOp();
+        bot.initTeleOpWithSensor(hardwareMap);
         bot.setTelemetry(telemetry);
         ctrl1 = new Controller(gamepad1);
         ctrl2 = new Controller(gamepad2);

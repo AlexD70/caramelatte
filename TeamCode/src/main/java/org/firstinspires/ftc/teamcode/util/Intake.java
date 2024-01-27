@@ -27,14 +27,22 @@ public class Intake {
         crs_rightGecko.setPower(-power);
     }
 
+
     public void startEject(){
         interruptCRSScheduler();
         setCRSPowers(-0.55);
     }
 
+
+    //am modificat la collect, pt ca voiam sa vedem daca cu o discrepanta de puteri putem sa luam pixelii mai bine de jos,
+    //in fact merge. Acum ia pixelii foarte constant direct in intake, fara sa trebuiasca sa dea afara si sa ia iar, also ia mai
+    //bine din stack
+
     public void startCollect(){
         interruptCRSScheduler();
-        setCRSPowers(.55);
+//        setCRSPowers(.55);
+        crs_leftGecko.setPower(0.1);
+        crs_rightGecko.setPower(-1);
     }
 
     public void stopCollect(){

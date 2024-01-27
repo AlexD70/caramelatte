@@ -20,6 +20,7 @@ public class HuskyLensDetection {
     private HuskyLens.Algorithm currentAlgo = HuskyLens.Algorithm.NONE;
     private boolean algoSet = false;
     public RandomisationCase lastKnownCase = RandomisationCase.UNKNOWN;
+    public int redID = 2, blueID = 1;
     public static final int PIXEL_ID = -1, CUSTOM_ELEMENT_ID = 1;
 
     private static final int XCOORD_LEFT = 90, XCOORD_RIGHT = 210;
@@ -157,7 +158,7 @@ public class HuskyLensDetection {
         }
         Thread.sleep(50);
 
-        HuskyLens.Block[] blocks = lens.blocks(2);
+        HuskyLens.Block[] blocks = lens.blocks(redID);
         telemetry.addData("LENGTH", blocks.length);
 
         HuskyLens.Block target = null;
@@ -198,7 +199,7 @@ public class HuskyLensDetection {
         }
         Thread.sleep(50);
 
-        HuskyLens.Block[] blocks = lens.blocks(2);
+        HuskyLens.Block[] blocks = lens.blocks(redID);
         telemetry.addData("LENGTH", blocks.length);
 
         HuskyLens.Block target = null;
@@ -241,7 +242,7 @@ public class HuskyLensDetection {
         }
         Thread.sleep(50);
 
-        HuskyLens.Block[] blocks = lens.blocks(3);
+        HuskyLens.Block[] blocks = lens.blocks(blueID);
         telemetry.addData("LENGTH", blocks.length);
 
         HuskyLens.Block target = null;
@@ -285,7 +286,7 @@ public class HuskyLensDetection {
         }
         Thread.sleep(50);
 
-        HuskyLens.Block[] blocks = lens.blocks(3);
+        HuskyLens.Block[] blocks = lens.blocks(blueID);
         telemetry.addData("LENGTH", blocks.length);
 
         HuskyLens.Block target = null;

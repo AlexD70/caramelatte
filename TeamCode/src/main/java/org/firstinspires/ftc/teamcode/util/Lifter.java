@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.PID;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.lib.PIDF;
 public class Lifter {
     protected DcMotorEx m_left, m_right;
 
-    // lower kP until lifter is no longer spasming around target position
+    // lower kP until lifter is no longer spasming around targetrget position
     private final double kP = 0.004d, kD = 0d, kI = 0.00001d;
     private final Supplier<Double> kF = () -> 0.02d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
@@ -69,15 +70,48 @@ public class Lifter {
         target = state.pos;
     }
 
+    boolean keepDown = false;
+    double downPow = -0.1;
+    public void keepDown(){
+        keepDown = true;
+    }
+
+    public void stopKeepDown(){
+        keepDown = false;
+    }
+
     public void goDownExtraVoltage(){
-        pidf.kP = 0.009;
-        pidf.kI = 0.00003;
+        pidf.kP = 0.0028;
+        pidf.kI = 0.00009;
         pidf.resetIntegral();
         goToPos(LifterStates.DOWN);
     }
 
+    public double velocity = 0, acceleration = 0, lastVel = 0;
+    public int lastPosition = 0, dtheta = 0;
+    private ElapsedTime dtTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     public void update(){
+        double dt = dtTimer.seconds();
+        lastPosition = currentPosition;
         currentPosition = m_left.getCurrentPosition();
+
+        lastVel = velocity;
+        dtheta = currentPosition - lastPosition;
+        velocity = (currentPosition - lastPosition) / dt;
+        acceleration = (velocity - lastVel) / dt;
+        dtTimer.reset();
+
+        if(keepDown){
+            m_left.setPower(downPow);
+            m_right.setPower(downPow);
+            return;
+        }
+
+        if(currentPosition > 2400){
+            m_left.setPower(0);
+            m_right.setPower(0);
+            return;
+        }
 
         if(lastTarget != target){
             pidf.setTargetPosition(target);
@@ -102,5 +136,7 @@ public class Lifter {
         telemetry.addData("Lifter target", target);
         telemetry.addData("Lifter power", power);
         telemetry.addData("Lifter state", 0);
+        telemetry.addData("velocity", velocity);
+        telemetry.addData("accel", acceleration);
     }
 }

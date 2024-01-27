@@ -7,14 +7,13 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstra
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TranslationalVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.Arm;
 import org.firstinspires.ftc.teamcode.util.BluePipeline;
 import org.firstinspires.ftc.teamcode.util.HuskyLensDetection;
 import org.firstinspires.ftc.teamcode.util.Intake;
@@ -25,20 +24,14 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "1 CYCLE CLOSE BLUE", group = "auto")
-public class BlueCloseCycle extends LinearOpMode {
+@Disabled
+@Autonomous(name = "1 CYCLE CLOSE BLUE V2", group = "auto")
+public class BlueCloseCycleV2 extends LinearOpMode {
     SampleMecanumDrive rr;
     Intake intake;
     VoltageScaledArm arm;
     Lifter lift;
-//    HuskyLensDetection husky;
     ColorSensor sensor;
-    TrajectorySequence toSpikeMark, toBackdrop, toStack, toBackdrop2;
-
-    PoseStorageV1 blueCloseLeft = new PoseStorageV1();
-    PoseStorageV1 blueCloseRight = new PoseStorageV1();
-    PoseStorageV1 blueCloseCenter = new PoseStorageV1();
-
     OpenCvWebcam webcam;
     BluePipeline pipeline = new BluePipeline();
     boolean cameraOK = true;
@@ -70,328 +63,52 @@ public class BlueCloseCycle extends LinearOpMode {
         });
     }
 
-    public void buildBlueCloseLeft() {
-        blueCloseLeft.toSpike =
-                rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
-                        .setReversed(true)
-                        .splineToLinearHeading(new Pose2d(-20, -33, Math.toRadians(90)), Math.toRadians(-90))
-                        .build();
-
-        blueCloseLeft.toBackdrop =
-                rr.trajectorySequenceBuilder(blueCloseLeft.toSpike.end())
-                        .lineToConstantHeading(new Vector2d(-9, -46.1))
-                        .addSpatialMarker(new Vector2d(-12, -45.5), () -> {
-                            lift.goToPos(1100);
-                            arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
-                            intake.forceAngleServoPos(0.75);
-                        })
-                        .build();
-
-        blueCloseLeft.toStack = rr.trajectorySequenceBuilder(blueCloseLeft.toBackdrop.end())
-                .splineToConstantHeading(new Vector2d(6, -6),Math.toRadians(90))
-                .lineTo(new Vector2d(6, 27))
-                .addSpatialMarker(new Vector2d(-12, 42), () -> {
-                    intake.forceAngleServoPos(0.3);
-                    intake.startCollect();
-                })
-                .splineToConstantHeading(new Vector2d(-16, 52),Math.toRadians(90))
-                .addSpatialMarker(new Vector2d(-16, 52), () -> {
-                    lift.keepDown();
-                    lift.update();
-                })
-                .forward(8, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
-                .back(7)
-                .forward(7, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
-                .build();
-
-        blueCloseLeft.toBackdrop2 =
-                rr.trajectorySequenceBuilder(blueCloseLeft.toStack.end())
-                        .setReversed(true)
-                        .splineToConstantHeading(new Vector2d(5, 38),Math.toRadians(-90))
-                        .addTemporalMarker(0.5, () -> {
-                            intake.forceAngleServoPos(0.9);
-                            lift.stopKeepDown();
-                            lift.goToPos(1);
-                        })
-                        .lineTo(new Vector2d(5, -6))
-                        .splineToConstantHeading(new Vector2d(-9.5, -46.4), Math.toRadians(-90))
-                        .build();
-    }
-    public void buildBlueCloseRight(){
-        blueCloseRight.toSpike = rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
-                .setReversed(true)
-                .lineToLinearHeading(new Pose2d(-18, -13.7, Math.toRadians(90)))
-                .build();
-
-        blueCloseRight.toBackdrop = rr.trajectorySequenceBuilder(blueCloseRight.toSpike.end())
-                .lineToConstantHeading(new Vector2d(-21, -45.7))
-                .addSpatialMarker(new Vector2d(-12, -45.5), () -> {
-                    lift.goToPos(1100);
-                    arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
-                    intake.forceAngleServoPos(0.75);
-                })
-                .build();
-
-        blueCloseRight.toStack = rr.trajectorySequenceBuilder(blueCloseRight.toBackdrop.end())
-                .splineToConstantHeading(new Vector2d(6.5, -6), Math.toRadians(90))
-                .lineTo(new Vector2d(6.5, 27))
-                .addSpatialMarker(new Vector2d(-12, 42), () -> {
-                    intake.forceAngleServoPos(0.3);
-                    intake.startCollect();
-                })
-                .splineToConstantHeading(new Vector2d(-19.3, 52), Math.toRadians(90))
-                .addSpatialMarker(new Vector2d(-19.3, 52), () -> {
-                    lift.keepDown();
-                    lift.update();
-                })
-                .forward(8, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
-                .back(7)
-                .forward(7, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
-                .build();
-
-        blueCloseRight.toBackdrop2 =
-                rr.trajectorySequenceBuilder(blueCloseRight.toStack.end())
-                        .setReversed(true)
-                        .splineToConstantHeading(new Vector2d(6.5, 38),Math.toRadians(-90))
-                        .addTemporalMarker(0.5, () -> {
-                            intake.forceAngleServoPos(0.9);
-                            lift.stopKeepDown();
-                            lift.goToPos(1);
-                        })
-                        .lineTo(new Vector2d(6.5, -6))
-                        .splineToConstantHeading(new Vector2d(-13, -45.4), Math.toRadians(-90))
-                        .build();
-
-    }
-    public void buildBlueCloseCenter() {
-        blueCloseCenter.toSpike = rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-25.6, -28.4, Math.toRadians(90)), Math.toRadians(-90))
-                .build();
-
-        blueCloseCenter.toBackdrop = rr.trajectorySequenceBuilder(blueCloseCenter.toSpike.end())
-                .lineToConstantHeading(new Vector2d(-15.3, -45.6))
-                .addSpatialMarker(new Vector2d(-15, -45.5), () -> {
-                    lift.goToPos(1100);
-                    arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
-                    intake.forceAngleServoPos(0.75);
-                })
-                .build();
-
-        blueCloseCenter.toStack = rr.trajectorySequenceBuilder(blueCloseCenter.toBackdrop.end())
-                .splineToConstantHeading(new Vector2d(6, -6),Math.toRadians(90))
-                .lineTo(new Vector2d(6, 27))
-                .addSpatialMarker(new Vector2d(-12, 42), () -> {
-                    intake.forceAngleServoPos(0.3);
-                    intake.startCollect();
-                })
-                .splineToConstantHeading(new Vector2d(-17, 52),Math.toRadians(90))
-                .addSpatialMarker(new Vector2d(-17, 52), () -> {
-                    lift.keepDown();
-                    lift.update();
-                })
-                .forward(8, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
-                .back(7)
-                .forward(7, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
-                .build();
-
-        blueCloseCenter.toBackdrop2 =
-                rr.trajectorySequenceBuilder(blueCloseCenter.toStack.end())
-                        .setReversed(true)
-                        .splineToConstantHeading(new Vector2d(5, 38),Math.toRadians(-90))
-                        .addTemporalMarker(0.5, () -> {
-                            intake.forceAngleServoPos(0.9);
-                            lift.stopKeepDown();
-                            lift.goToPos(1);
-                        })
-                        .lineTo(new Vector2d(5, -6))
-                        .splineToConstantHeading(new Vector2d(-12, -46.4), Math.toRadians(-90))
-                        .build();
-    }
-
     @Override
     public void runOpMode() throws InterruptedException {
         rr = new SampleMecanumDrive(hardwareMap);
         intake = new Intake(hardwareMap);
         arm = new VoltageScaledArm(hardwareMap);
         lift = new Lifter(hardwareMap);
-//        husky = new HuskyLensDetection(hardwareMap, "husky");
         sensor = hardwareMap.get(ColorSensor.class, "sensor");
-
-        buildBlueCloseLeft();
-        buildBlueCloseRight();
-        buildBlueCloseCenter();
 
         initDetection();
 
         pipeline.startDetection(true);
-        int randomization = -2;
 
-        while(opModeInInit()) {
-            if (cameraOK) {
-                telemetry.addLine("Webcam Ok");
-                telemetry.addLine("Ready! Press Play");
-                randomization = pipeline.getCase();
-                telemetry.addData("case", randomization);
-            } else {
-                telemetry.addLine("Webcam failed, please RESTART!");
-                telemetry.update();
-            }
+        if (cameraOK) {
+            telemetry.addLine("Webcam Ok");
+
+            telemetry.addLine("Ready! Press Play");
+        } else {
+            telemetry.addLine("Webcam failed, please RESTART!");
             telemetry.update();
+            sleep(1000);
         }
 
-//        HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
-
-
-//        while(!isStarted()){
-//            randomisationCase = husky.getCaseBlueClose(telemetry);
-//            telemetry.addData("CASE ", randomisationCase);
-//            telemetry.update();
-//        }
+        while(opModeInInit()){
+            telemetry.addData("case", pipeline.whichCase);
+        }
 
         waitForStart();
-        pipeline.killThis();
         sensor.enableLed(false);
 
-        if(randomization == -2){
-            randomization = 1;
-        }
+        pipeline.killThis();
+        webcam.stopStreaming();
+        webcam.closeCameraDevice();
 
-//        if(randomisationCase != HuskyLensDetection.RandomisationCase.UNKNOWN){
-//            randomization = randomisationCase.val;
-//        }
+        int randomization = (int) Math.round(Math.random() * 2) - 3;
+
+        if(pipeline.whichCase != -2){
+            randomization = pipeline.whichCase;
+        }
 
         if (randomization == 1) { // STANGA BLUE
-            runAuto(blueCloseLeft);
+            blueLeft();
         } else if (randomization == 0) { // CENTER BLUE
-            runAuto(blueCloseCenter);
+            centerBlue();
         } else { // DREAPTA BLUE
-            runAuto(blueCloseRight);
+            rightBluePreload();
         }
-    }
-
-    public void runAuto(PoseStorageV1 trajectories) throws InterruptedException {
-
-        rr.followTrajectorySequenceAsync(trajectories.toSpike);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-        }
-
-        intake.forceAngleServoPos(0.3);
-        Thread.sleep(250);
-        intake.dropPixel();
-        intake.forceAngleServoPos(0.75);
-        Thread.sleep(200);
-
-        rr.followTrajectorySequenceAsync(trajectories.toBackdrop);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-            lift.update();
-            arm.update(telemetry);
-        }
-
-        while(arm.isArmBusy() && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        ElapsedTime timer = new ElapsedTime();
-        while(timer.milliseconds() < 200 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-        }
-
-        intake.dropPixel();
-        //  intake.forceAngleServoPos(0.75);
-        timer.reset();
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
-        while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-        lift.goToPos(Lifter.LifterStates.DOWN);
-        timer.reset();
-        while(timer.seconds() < 0.6 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-
-        /*
-        rr.followTrajectorySequence(trajectories.toStack);
-        intake.stopCollect();
-        rr.followTrajectorySequenceAsync(trajectories.toBackdrop2);
-        while((rr.isBusy() || lift.isBusy()) && !isStopRequested()){
-            lift.update();
-            rr.update();
-        }
-
-//        while(rr.isBusy() && !isStopRequested()){
-//            rr.update();
-//            lift.update();
-//            arm.update(telemetry);
-//        }
-
-        intake.forceAngleServoPos(0.75);
-        lift.goToPos(Lifter.LifterStates.HIGH);
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
-
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        while(arm.isArmBusy() && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        while(lift.isBusy() && !isStopRequested()){
-            lift.update(); //  prevent idiot bug
-        }
-
-        intake.dropPixel();
-        intake.dropPixel();
-        sleep(200);
-        intake.forceAngleServoPos(0.9);
-
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
-        timer.reset();
-        while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-        lift.goToPos(Lifter.LifterStates.DOWN);
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-        while(lift.isBusy() && !isStopRequested()){
-            lift.update();
-        }*/
-
-        rr.followTrajectorySequence(
-                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeRight(27)
-                        .build()
-        );
-
     }
 
 
@@ -472,8 +189,6 @@ public class BlueCloseCycle extends LinearOpMode {
                         .build()
         );
 
-        webcam.stopStreaming();
-        webcam.closeCameraDevice();
     }
 
     public void blueLeft() throws InterruptedException { // TestAxes.java
@@ -570,26 +285,27 @@ public class BlueCloseCycle extends LinearOpMode {
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
                         .setReversed(true)
                         .splineToConstantHeading(new Vector2d(5, 38),Math.toRadians(-90))
-                        .addTemporalMarker(1, () -> {
+                        .addDisplacementMarker(3, () -> {
                             intake.forceAngleServoPos(0.9);
                         })
                         .lineTo(new Vector2d(5, -6))
                         .splineToConstantHeading(new Vector2d(-9, -45.8), Math.toRadians(-90))
+                        .addSpatialMarker(new Vector2d(-5, -30), () -> {
+                            lift.goToPos(1300);
+                        })
+                        .addSpatialMarker(new Vector2d(-7, -40), () -> {
+                            arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
+                        })
                         .build()
         );
-
         while(rr.isBusy() && !isStopRequested()){
             rr.update();
             lift.update();
             arm.update(telemetry);
         }
-
         intake.forceAngleServoPos(0.75);
-        lift.goToPos(Lifter.LifterStates.HIGH);
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
 
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
+        while(lift.isBusy() && !isStopRequested()){
             lift.update();
             arm.update(telemetry);
             lift.printDebug(telemetry);
@@ -604,127 +320,8 @@ public class BlueCloseCycle extends LinearOpMode {
         }
 
         intake.dropPixel();
-        sleep(200);
-        intake.forceAngleServoPos(0.9);
-
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
-        timer.reset();
-        while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-        lift.goToPos(Lifter.LifterStates.DOWN);
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-
-        rr.followTrajectorySequence(
-                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeRight(20)
-                        .build()
-        );
-    }
-
-    // start trajectories
-
-
-
-    public void blueLeftRR() throws InterruptedException { // TestAxes.java
-
-        rr.followTrajectorySequenceAsync(toSpikeMark);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-        }
-
-        intake.forceAngleServoPos(0.3);
-        Thread.sleep(250);
+        sleep(500);
         intake.dropPixel();
-        intake.forceAngleServoPos(0.75);
-        Thread.sleep(200);
-
-        rr.followTrajectorySequenceAsync(toBackdrop);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-            lift.update();
-            arm.update(telemetry);
-        }
-
-        while(arm.isArmBusy() && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        ElapsedTime timer = new ElapsedTime();
-        sleep(200);
-
-        intake.dropPixel();
-        //  intake.forceAngleServoPos(0.75);
-        timer.reset();
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);
-        while(timer.seconds() < 1 && !isStopRequested()){
-            arm.update(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-        lift.goToPos(Lifter.LifterStates.DOWN);
-        timer.reset();
-        while(timer.seconds() < 0.6 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-            telemetry.update();
-        }
-
-        rr.followTrajectorySequence(toStack);
-//        while(timer.seconds() < 2 && !isStopRequested()){
-//            lift.update();
-//            arm.update(telemetry);
-//            lift.printDebug(telemetry);
-//            arm.printDebug(telemetry);
-//            telemetry.update();
-//        }
-        intake.stopCollect();
-//        lift.stopKeepDown();
-
-        rr.followTrajectorySequence(toBackdrop2);
-
-        while(rr.isBusy() && !isStopRequested()){
-            rr.update();
-            lift.update();
-            arm.update(telemetry);
-        }
-
-        intake.forceAngleServoPos(0.75);
-        lift.goToPos(Lifter.LifterStates.HIGH);
-        arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
-
-        timer.reset();
-        while(timer.seconds() < 1.5 && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        while(arm.isArmBusy() && !isStopRequested()){
-            lift.update();
-            arm.update(telemetry);
-            lift.printDebug(telemetry);
-            arm.printDebug(telemetry);
-        }
-
-        intake.dropPixel();
-        sleep(200);
         intake.forceAngleServoPos(0.9);
 
         arm.setArmTarget(VoltageScaledArm.ArmPositions.COLLECT);

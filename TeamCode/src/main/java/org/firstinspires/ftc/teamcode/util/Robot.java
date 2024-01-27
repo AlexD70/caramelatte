@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util;
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -20,6 +21,7 @@ public class Robot {
     public final PlaneLauncher launcher;
     public final Intake intake;
     public Telemetry telemetry;
+    public ColorSensor sensor;
 
     public boolean debugMode = false;
 
@@ -74,6 +76,12 @@ public class Robot {
     public void initTeleOp(){
         arm.setArmTarget(Arm.ArmPositions.COLLECT);
         RobotTeleOpActions.initActions(this);
+    }
+
+    public void initTeleOpWithSensor(HardwareMap hwmap){
+        initTeleOp();
+        sensor = hwmap.get(ColorSensor.class, "sensor");
+        sensor.enableLed(false);
     }
 
     public void initTeleOpV2(HardwareMap hwmap){

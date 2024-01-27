@@ -2,40 +2,42 @@ package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
 
-import  com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.ArmControllerPID;
+import org.firstinspires.ftc.teamcode.lib.VoltageScaledCosPID;
 
-public class Arm {
+public class VoltageScaledArm {
     protected DcMotorEx m_armMotor;
 
     private int armPosition = 0, armTarget = 0, lastArmTarget = 0;
-    private final double kP = 0.0035, kD = 0, kI = 0.00001, kCos = 0.1;
-    private final ArmControllerPID pid = new ArmControllerPID(kP, kD, kI, kCos);
+    private final double kP = 0.00469, kD = 0.0008, kI = 0, kCos = 0.016;
+    private VoltageScaledCosPID pid = null;
     private boolean armInManual = false, isBusy = false; // manual actually means dont use encoders
     private double manualArmPower = 0, power = 0;
 
     // ======================== ARM - MOTOR ========================
 
-    public Arm(@NonNull HardwareMap hwmap){
+    public VoltageScaledArm(@NonNull HardwareMap hwmap){
         m_armMotor = hwmap.get(DcMotorEx.class, HardwareConfig.ARM);
         m_armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         m_armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m_armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_armMotor.setDirection(DcMotorSimple.Direction.REVERSE); // use this to have positive state positions
 
+        pid = new VoltageScaledCosPID(kP, kD, kI, kCos, hwmap.getAll(VoltageSensor.class).get(0));
         pid.setPowerLimits(-0.7, 0.7);
     }
 
     public enum ArmPositions {
-        INIT(0), COLLECT(0), PLACE(1800), PRELOAD_PLACE(1800), PLACE_AUTO(1600), HANG(1200), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), COLLECT(0), PLACE(1800), PRELOAD_PLACE(1800), PLACE_AUTO(1600), HANG(1200), MANUAL(-1), NO_ENCODER(-2),
+        COLLECT_FORCE_POSITIVE(10);
 
         public int pos;
 
@@ -87,11 +89,11 @@ public class Arm {
                 timer.reset();
             }
 
-            if(Math.abs(armTarget - armPosition) > 10 && (isBusy || currentState == ArmPositions.MANUAL)){
+            if(Math.abs(armTarget - armPosition) > 8 && (isBusy || currentState == ArmPositions.MANUAL)){
                 double pow = pid.update(armPosition, getApproximateAngle(), telemetry);
                 power = pow;
                 m_armMotor.setPower(pow);
-            } else if (Math.abs(armTarget - armPosition) < 10){
+            } else if (Math.abs(armTarget - armPosition) < 8){
                 isBusy = false;
                 power = 0;
                 m_armMotor.setPower(0);
@@ -120,6 +122,7 @@ public class Arm {
         currentState = target;
     }
 
+    @Deprecated
     public void forceArmToPosition(int position){
         setArmTarget(position);
         currentState = ArmPositions.MANUAL;
