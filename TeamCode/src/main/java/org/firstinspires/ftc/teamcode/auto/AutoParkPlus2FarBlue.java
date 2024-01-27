@@ -8,12 +8,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Arm;
+import org.firstinspires.ftc.teamcode.util.BluePipeline;
 import org.firstinspires.ftc.teamcode.util.HuskyLensDetection;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Lifter;
 import org.firstinspires.ftc.teamcode.util.VoltageScaledArm;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous(name = "2+P FAR BLUE", group = "auto")
 public class AutoParkPlus2FarBlue extends LinearOpMode {
@@ -23,6 +29,37 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
     Lifter lift;
     HuskyLensDetection husky;
     ColorSensor sensor;
+    OpenCvWebcam webcam;
+    BluePipeline pipeline = new BluePipeline();
+    boolean cameraOK = true;
+
+    private void initDetection() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
+
+        webcam.setMillisecondsPermissionTimeout(3000); //3000
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                try {
+                    Thread.sleep(1000); // always wait before pressing start
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                webcam.setPipeline(pipeline);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                telemetry.addData("camera failed to open:", errorCode);
+                telemetry.update();
+                cameraOK = false;
+            }
+        });
+    }
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -30,26 +67,37 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
         intake = new Intake(hardwareMap);
         arm = new VoltageScaledArm(hardwareMap);
         lift = new Lifter(hardwareMap);
-        husky = new HuskyLensDetection(hardwareMap, "husky");
+//        husky = new HuskyLensDetection(hardwareMap, "husky");
         sensor = hardwareMap.get(ColorSensor.class, "sensor");
 
-        HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
+//        HuskyLensDetection.RandomisationCase randomisationCase = HuskyLensDetection.RandomisationCase.UNKNOWN;
 
-        while(!isStarted()){
-            randomisationCase = husky.getCaseBlueFar(telemetry);
-            telemetry.addData("CASE ", randomisationCase);
+        initDetection();
+
+        pipeline.startDetection(false);
+        int randomization = -2;
+
+        while(opModeInInit()) {
+            if (cameraOK) {
+                telemetry.addLine("Webcam Ok");
+                telemetry.addLine("Ready! Press Play");
+                randomization = pipeline.getCase();
+                telemetry.addData("case", randomization);
+            } else {
+                telemetry.addLine("Webcam failed, please RESTART!");
+                telemetry.update();
+            }
             telemetry.update();
+        }
+
+        if(randomization == -2){
+            randomization = 1;
         }
 
         waitForStart();
         sensor.enableLed(false);
 
-        int randomization = (int) Math.round(Math.random() * 2) - 3;
-
-        if(randomisationCase != HuskyLensDetection.RandomisationCase.UNKNOWN){
-            randomization = randomisationCase.val;
-        }
-
+        sleep(2000);
         if (randomization == 1) { // STANGA BLUE
             blueLeft();
         } else if (randomization == 0) { // CENTER BLUE
@@ -83,8 +131,8 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
                         .back(20)
                         .setTangent(0)
-                        .splineToConstantHeading(new Vector2d(0, -79), Math.toRadians(-90))
-                        .splineToConstantHeading(new Vector2d(-5.7, -100), Math.toRadians(-90))
+                        .splineToConstantHeading(new Vector2d(0, -68), Math.toRadians(-90))
+                        .splineToConstantHeading(new Vector2d(-8.8, -100), Math.toRadians(-90))
                         .addSpatialMarker(new Vector2d(-3, -90), () -> {
                             lift.goToPos(1100);
                         })
@@ -135,11 +183,11 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
             telemetry.update();
         }
 
-        rr.followTrajectorySequence(
-                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeLeft(30)
-                        .build()
-        );
+//        rr.followTrajectorySequence(
+//                rr.trajectorySequenceBuilder(rr.getPoseEstimate())
+//                        .strafeLeft(30)
+//                        .build()
+//        );
 
     }
 
@@ -258,7 +306,7 @@ public class AutoParkPlus2FarBlue extends LinearOpMode {
                         .lineToLinearHeading(new Pose2d(-41, -60, Math.toRadians(90)))
                         .back(10)
                         //.strafeRight(63, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(20))
-                        .lineToLinearHeading(new Pose2d(-21.1, -101, Math.toRadians(90)))
+                        .lineToLinearHeading(new Pose2d(-25, -100.3, Math.toRadians(90)))
                         .build()
         );
 

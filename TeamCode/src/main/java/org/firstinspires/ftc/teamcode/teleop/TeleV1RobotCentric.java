@@ -17,7 +17,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
     public void controller1Actions(){
         // DRIVE
         if(ctrl1.bumperLeft.isDown()) {
-            RobotTeleOpActions.drive(ctrl1, 0.3); // slow
+            RobotTeleOpActions.drive(ctrl1, 0.2); // slow
 
         } /*else if (ctrl1.isRightTriggerDown()){
             RobotTeleOpActions.drive(ctrl1, 1); // fast

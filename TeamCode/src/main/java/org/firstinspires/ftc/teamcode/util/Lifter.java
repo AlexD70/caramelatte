@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.lib.PIDF;
 public class Lifter {
     protected DcMotorEx m_left, m_right;
 
-    // lower kP until lifter is no longer spasming around target position
+    // lower kP until lifter is no longer spasming around targetrget position
     private final double kP = 0.004d, kD = 0d, kI = 0.00001d;
     private final Supplier<Double> kF = () -> 0.02d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
@@ -71,7 +71,7 @@ public class Lifter {
     }
 
     boolean keepDown = false;
-    double downPow = -0.05;
+    double downPow = -0.1;
     public void keepDown(){
         keepDown = true;
     }
@@ -101,9 +101,16 @@ public class Lifter {
         acceleration = (velocity - lastVel) / dt;
         dtTimer.reset();
 
-        if(currentPosition > 2200){
+        if(keepDown){
+            m_left.setPower(downPow);
+            m_right.setPower(downPow);
+            return;
+        }
+
+        if(currentPosition > 2400){
             m_left.setPower(0);
             m_right.setPower(0);
+            return;
         }
 
         if(lastTarget != target){

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.BluePipeline;
+import org.firstinspires.ftc.teamcode.util.RedBluePipeline;
 import org.firstinspires.ftc.teamcode.util.StackPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -15,7 +16,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @Autonomous(name = "test stack detection")
 public class TestStackDetection extends LinearOpMode {
     OpenCvWebcam webcam;
-    BluePipeline pipeline = new BluePipeline();
+    RedBluePipeline pipeline = new RedBluePipeline();
     boolean cameraOK = true;
 
     private void initDetection() {
@@ -49,7 +50,7 @@ public class TestStackDetection extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initDetection();
 
-        pipeline.startDetection(false);
+        pipeline.startDetection(true);
 
         if (cameraOK) {
             telemetry.addLine("Webcam Ok");

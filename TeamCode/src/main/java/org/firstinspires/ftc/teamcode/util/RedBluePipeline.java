@@ -12,7 +12,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BluePipeline extends OpenCvPipeline {
+public class RedBluePipeline extends OpenCvPipeline {
     boolean kill = true;
     int stack = 0;
     boolean close = false;
@@ -43,15 +43,24 @@ public class BluePipeline extends OpenCvPipeline {
         }
 
         Mat whiteObjs = new Mat();
+        Mat redObjs = new Mat();
 
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+        Imgproc.medianBlur(input, input, 5);
 
-        Point topLeft = new Point(0, 180);
+        int crop = 75;
+        if(!close){
+            crop = 125;
+        }
+        Point topLeft = new Point(0, crop);
         Point bottomRight =  new Point(320, 240);
         Rect roi =  new Rect(topLeft, bottomRight);
         Mat croppedInput = new Mat(input, roi);
 
-        Core.inRange(croppedInput, new Scalar(100, 150, 0), new Scalar(140, 255, 255), whiteObjs);
+        Core.inRange(croppedInput, new Scalar(0, 50, 45),  new Scalar(10, 255, 255), whiteObjs);
+        Core.inRange(croppedInput, new Scalar(170, 50, 45), new Scalar(180, 255, 255), redObjs);
+
+        Core.bitwise_or(whiteObjs, redObjs, whiteObjs);
 
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(whiteObjs, contours, whiteObjs, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -60,42 +69,46 @@ public class BluePipeline extends OpenCvPipeline {
         double area = 0;
         for(MatOfPoint contour : contours){
             Rect rect = Imgproc.boundingRect(contour);
-            if(rect.width > 100){
-                continue;
-            }
+//            if(rect.width > 120){
+//                continue;
+//            }
 
-            if(rect.area() < 90){
+            if(rect.height < 30 && close){
                 continue;
             }
 
             if(rect.area() > area){
                 area = rect.area();
                 target = rect;
-                rect.y += 180;
+                rect.y += crop;
             }
         }
 
-        croppedInput.release();
+//        croppedInput.release();
         if(target == null){
-            whichCase = -2;
+            if(close){
+                whichCase = 1;
+            }
             return input;
         }
 
         if(close) {
-            if (target.x < 110) {
-                whichCase = 1;
-            } else if (target.x > 250) {
+            if (target.x < 180) {
+                whichCase = 0;
+            } else if (target.x > 180) {
                 whichCase = -1;
             } else {
-                whichCase = 0;
+                whichCase = 1;
             }
         } else {
-            if(target.x > 130){
+            if (target.x > 200) {
                 whichCase = -1;
-            } else if (target.x < 130){
-                whichCase = 0;
-            } else if (target.area() < 50) {
+            } else if (target.x < 100) {
                 whichCase = 1;
+            } else if(target.area() < 150){
+                whichCase = 1;
+            } else {
+                whichCase = 0;
             }
         }
 

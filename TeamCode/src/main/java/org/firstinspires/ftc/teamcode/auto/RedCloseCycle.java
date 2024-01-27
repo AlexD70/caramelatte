@@ -14,19 +14,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.Arm;
-import org.firstinspires.ftc.teamcode.util.BluePipeline;
-import org.firstinspires.ftc.teamcode.util.HuskyLensDetection;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Lifter;
+import org.firstinspires.ftc.teamcode.util.RedBluePipeline;
 import org.firstinspires.ftc.teamcode.util.VoltageScaledArm;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "1 CYCLE CLOSE BLUE", group = "auto")
-public class BlueCloseCycle extends LinearOpMode {
+@Autonomous(name = "1 CYCLE CLOSE RED", group = "auto")
+public class RedCloseCycle extends LinearOpMode {
     SampleMecanumDrive rr;
     Intake intake;
     VoltageScaledArm arm;
@@ -35,12 +33,12 @@ public class BlueCloseCycle extends LinearOpMode {
     ColorSensor sensor;
     TrajectorySequence toSpikeMark, toBackdrop, toStack, toBackdrop2;
 
-    PoseStorageV1 blueCloseLeft = new PoseStorageV1();
-    PoseStorageV1 blueCloseRight = new PoseStorageV1();
-    PoseStorageV1 blueCloseCenter = new PoseStorageV1();
+    PoseStorageV1 redCloseLeft = new PoseStorageV1();
+    PoseStorageV1 redCloseRight = new PoseStorageV1();
+    PoseStorageV1 redCloseCenter = new PoseStorageV1();
 
     OpenCvWebcam webcam;
-    BluePipeline pipeline = new BluePipeline();
+    RedBluePipeline pipeline = new RedBluePipeline();
     boolean cameraOK = true;
 
     private void initDetection() {
@@ -70,32 +68,32 @@ public class BlueCloseCycle extends LinearOpMode {
         });
     }
 
-    public void buildBlueCloseLeft() {
-        blueCloseLeft.toSpike =
+    public void buildRedCloseLeft() {
+        redCloseLeft.toSpike =
                 rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                         .setReversed(true)
-                        .splineToLinearHeading(new Pose2d(-20, -33, Math.toRadians(90)), Math.toRadians(-90))
+                        .splineToLinearHeading(new Pose2d(-20, 34, Math.toRadians(-90)), Math.toRadians(90))
                         .build();
 
-        blueCloseLeft.toBackdrop =
-                rr.trajectorySequenceBuilder(blueCloseLeft.toSpike.end())
-                        .lineToConstantHeading(new Vector2d(-9, -46.1))
-                        .addSpatialMarker(new Vector2d(-12, -45.5), () -> {
+        redCloseLeft.toBackdrop =
+                rr.trajectorySequenceBuilder(redCloseLeft.toSpike.end())
+                        .lineToConstantHeading(new Vector2d(-9, 46.5))
+                        .addSpatialMarker(new Vector2d(-12, 45.5), () -> {
                             lift.goToPos(1100);
                             arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
                             intake.forceAngleServoPos(0.75);
                         })
                         .build();
 
-        blueCloseLeft.toStack = rr.trajectorySequenceBuilder(blueCloseLeft.toBackdrop.end())
-                .splineToConstantHeading(new Vector2d(6, -6),Math.toRadians(90))
-                .lineTo(new Vector2d(6, 27))
-                .addSpatialMarker(new Vector2d(-12, 42), () -> {
+        redCloseLeft.toStack = rr.trajectorySequenceBuilder(redCloseLeft.toBackdrop.end())
+                .splineToConstantHeading(new Vector2d(6.5, 6), Math.toRadians(-90))
+                .lineTo(new Vector2d(6.5, -27))
+                .addSpatialMarker(new Vector2d(-12, -42), () -> {
                     intake.forceAngleServoPos(0.3);
                     intake.startCollect();
                 })
-                .splineToConstantHeading(new Vector2d(-16, 52),Math.toRadians(90))
-                .addSpatialMarker(new Vector2d(-16, 52), () -> {
+                .splineToConstantHeading(new Vector2d(-13, -52), Math.toRadians(-90))
+                .addSpatialMarker(new Vector2d(-13, -52), () -> {
                     lift.keepDown();
                     lift.update();
                 })
@@ -104,43 +102,43 @@ public class BlueCloseCycle extends LinearOpMode {
                 .forward(7, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
                 .build();
 
-        blueCloseLeft.toBackdrop2 =
-                rr.trajectorySequenceBuilder(blueCloseLeft.toStack.end())
+        redCloseLeft.toBackdrop2 =
+                rr.trajectorySequenceBuilder(redCloseLeft.toStack.end())
                         .setReversed(true)
-                        .splineToConstantHeading(new Vector2d(5, 38),Math.toRadians(-90))
+                        .splineToConstantHeading(new Vector2d(5, -38),Math.toRadians(90))
                         .addTemporalMarker(0.5, () -> {
                             intake.forceAngleServoPos(0.9);
                             lift.stopKeepDown();
                             lift.goToPos(1);
                         })
-                        .lineTo(new Vector2d(5, -6))
-                        .splineToConstantHeading(new Vector2d(-9.5, -46.4), Math.toRadians(-90))
+                        .lineTo(new Vector2d(5, 6))
+                        .splineToConstantHeading(new Vector2d(-9.5, 46.4), Math.toRadians(90))
                         .build();
     }
-    public void buildBlueCloseRight(){
-        blueCloseRight.toSpike = rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
+    public void buildRedCloseRight(){
+        redCloseRight.toSpike = rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                 .setReversed(true)
-                .lineToLinearHeading(new Pose2d(-18, -13.7, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-18, 13.5, Math.toRadians(-90)))
                 .build();
 
-        blueCloseRight.toBackdrop = rr.trajectorySequenceBuilder(blueCloseRight.toSpike.end())
-                .lineToConstantHeading(new Vector2d(-21, -45.7))
-                .addSpatialMarker(new Vector2d(-12, -45.5), () -> {
+        redCloseRight.toBackdrop = rr.trajectorySequenceBuilder(redCloseRight.toSpike.end())
+                .lineToConstantHeading(new Vector2d(-21, 46.5))
+                .addSpatialMarker(new Vector2d(-12, 45.5), () -> {
                     lift.goToPos(1100);
                     arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
                     intake.forceAngleServoPos(0.75);
                 })
                 .build();
 
-        blueCloseRight.toStack = rr.trajectorySequenceBuilder(blueCloseRight.toBackdrop.end())
-                .splineToConstantHeading(new Vector2d(6.5, -6), Math.toRadians(90))
-                .lineTo(new Vector2d(6.5, 27))
-                .addSpatialMarker(new Vector2d(-12, 42), () -> {
+        redCloseRight.toStack = rr.trajectorySequenceBuilder(redCloseRight.toBackdrop.end())
+                .splineToConstantHeading(new Vector2d(6.5, 6), Math.toRadians(-90))
+                .lineTo(new Vector2d(6.5, -27))
+                .addSpatialMarker(new Vector2d(-12, -42), () -> {
                     intake.forceAngleServoPos(0.3);
                     intake.startCollect();
                 })
-                .splineToConstantHeading(new Vector2d(-19.3, 52), Math.toRadians(90))
-                .addSpatialMarker(new Vector2d(-19.3, 52), () -> {
+                .splineToConstantHeading(new Vector2d(-14.7, -52), Math.toRadians(-90))
+                .addSpatialMarker(new Vector2d(-14.7, -52), () -> {
                     lift.keepDown();
                     lift.update();
                 })
@@ -149,44 +147,44 @@ public class BlueCloseCycle extends LinearOpMode {
                 .forward(7, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
                 .build();
 
-        blueCloseRight.toBackdrop2 =
-                rr.trajectorySequenceBuilder(blueCloseRight.toStack.end())
+        redCloseRight.toBackdrop2 =
+                rr.trajectorySequenceBuilder(redCloseRight.toStack.end())
                         .setReversed(true)
-                        .splineToConstantHeading(new Vector2d(6.5, 38),Math.toRadians(-90))
+                        .splineToConstantHeading(new Vector2d(6.5, -38), Math.toRadians(90))
                         .addTemporalMarker(0.5, () -> {
                             intake.forceAngleServoPos(0.9);
                             lift.stopKeepDown();
                             lift.goToPos(1);
                         })
-                        .lineTo(new Vector2d(6.5, -6))
-                        .splineToConstantHeading(new Vector2d(-13, -45.4), Math.toRadians(-90))
+                        .lineTo(new Vector2d(6.5, 6))
+                        .splineToConstantHeading(new Vector2d(-13, 45.4), Math.toRadians(90))
                         .build();
 
     }
-    public void buildBlueCloseCenter() {
-        blueCloseCenter.toSpike = rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
+    public void buildRedCloseCenter() {
+        redCloseCenter.toSpike = rr.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-25.6, -28.4, Math.toRadians(90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-25, 28, Math.toRadians(-90)), Math.toRadians(90))
                 .build();
 
-        blueCloseCenter.toBackdrop = rr.trajectorySequenceBuilder(blueCloseCenter.toSpike.end())
-                .lineToConstantHeading(new Vector2d(-15.3, -45.6))
-                .addSpatialMarker(new Vector2d(-15, -45.5), () -> {
+        redCloseCenter.toBackdrop = rr.trajectorySequenceBuilder(redCloseCenter.toSpike.end())
+                .lineToConstantHeading(new Vector2d(-15, 45.8 ))
+                .addSpatialMarker(new Vector2d(-15, 45.5), () -> {
                     lift.goToPos(1100);
                     arm.setArmTarget(VoltageScaledArm.ArmPositions.PLACE);
                     intake.forceAngleServoPos(0.75);
                 })
                 .build();
 
-        blueCloseCenter.toStack = rr.trajectorySequenceBuilder(blueCloseCenter.toBackdrop.end())
-                .splineToConstantHeading(new Vector2d(6, -6),Math.toRadians(90))
-                .lineTo(new Vector2d(6, 27))
-                .addSpatialMarker(new Vector2d(-12, 42), () -> {
+        redCloseCenter.toStack = rr.trajectorySequenceBuilder(redCloseCenter.toBackdrop.end())
+                .splineToConstantHeading(new Vector2d(6, 6), Math.toRadians(-90))
+                .lineTo(new Vector2d(6, -27))
+                .addSpatialMarker(new Vector2d(-12, -42), () -> {
                     intake.forceAngleServoPos(0.3);
                     intake.startCollect();
                 })
-                .splineToConstantHeading(new Vector2d(-17, 52),Math.toRadians(90))
-                .addSpatialMarker(new Vector2d(-17, 52), () -> {
+                .splineToConstantHeading(new Vector2d(-12, -52), Math.toRadians(-90))
+                .addSpatialMarker(new Vector2d(-12, -52), () -> {
                     lift.keepDown();
                     lift.update();
                 })
@@ -195,17 +193,17 @@ public class BlueCloseCycle extends LinearOpMode {
                 .forward(7, new TranslationalVelocityConstraint(30), new ProfileAccelerationConstraint(10))
                 .build();
 
-        blueCloseCenter.toBackdrop2 =
-                rr.trajectorySequenceBuilder(blueCloseCenter.toStack.end())
+        redCloseCenter.toBackdrop2 =
+                rr.trajectorySequenceBuilder(redCloseCenter.toStack.end())
                         .setReversed(true)
-                        .splineToConstantHeading(new Vector2d(5, 38),Math.toRadians(-90))
+                        .splineToConstantHeading(new Vector2d(6, -38),Math.toRadians(90))
                         .addTemporalMarker(0.5, () -> {
                             intake.forceAngleServoPos(0.9);
                             lift.stopKeepDown();
                             lift.goToPos(1);
                         })
-                        .lineTo(new Vector2d(5, -6))
-                        .splineToConstantHeading(new Vector2d(-12, -46.4), Math.toRadians(-90))
+                        .lineTo(new Vector2d(6, 6))
+                        .splineToConstantHeading(new Vector2d(-9.5, 46.3), Math.toRadians(90))
                         .build();
     }
 
@@ -218,9 +216,9 @@ public class BlueCloseCycle extends LinearOpMode {
 //        husky = new HuskyLensDetection(hardwareMap, "husky");
         sensor = hardwareMap.get(ColorSensor.class, "sensor");
 
-        buildBlueCloseLeft();
-        buildBlueCloseRight();
-        buildBlueCloseCenter();
+        buildRedCloseLeft();
+        buildRedCloseRight();
+        buildRedCloseCenter();
 
         initDetection();
 
@@ -261,12 +259,12 @@ public class BlueCloseCycle extends LinearOpMode {
 //            randomization = randomisationCase.val;
 //        }
 
-        if (randomization == 1) { // STANGA BLUE
-            runAuto(blueCloseLeft);
+        if (randomization == -1) { // STANGA BLUE
+           runAuto(redCloseLeft);
         } else if (randomization == 0) { // CENTER BLUE
-            runAuto(blueCloseCenter);
+            runAuto(redCloseCenter);
         } else { // DREAPTA BLUE
-            runAuto(blueCloseRight);
+            runAuto(redCloseRight);
         }
     }
 
@@ -323,7 +321,6 @@ public class BlueCloseCycle extends LinearOpMode {
             telemetry.update();
         }
 
-        /*
         rr.followTrajectorySequence(trajectories.toStack);
         intake.stopCollect();
         rr.followTrajectorySequenceAsync(trajectories.toBackdrop2);
@@ -384,11 +381,11 @@ public class BlueCloseCycle extends LinearOpMode {
         }
         while(lift.isBusy() && !isStopRequested()){
             lift.update();
-        }*/
+        }
 
         rr.followTrajectorySequence(
                 rr.trajectorySequenceBuilder(rr.getPoseEstimate())
-                        .strafeRight(27)
+                        .strafeLeft(20)
                         .build()
         );
 
