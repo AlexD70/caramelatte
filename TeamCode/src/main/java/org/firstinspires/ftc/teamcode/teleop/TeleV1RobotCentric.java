@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.lib.Controller;
 import org.firstinspires.ftc.teamcode.util.Lifter;
 import org.firstinspires.ftc.teamcode.util.MiscActions;
+import org.firstinspires.ftc.teamcode.util.NewIntake;
 import org.firstinspires.ftc.teamcode.util.Robot;
 import org.firstinspires.ftc.teamcode.util.RobotTeleOpActions;
 
@@ -54,7 +55,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
         RobotTeleOpActions.overrideLimits(ctrl2.share.isPressed());
 
         if(ctrl2.square.isPressed()){
-            bot.intake.forceAngleServoPos(0.8);
+            bot.s_angleAdjust_broom.broomToAngle(NewIntake.AngleAdjustStates_BROOM.NEUTRAL);
         }
     }
 
@@ -86,7 +87,7 @@ public class TeleV1RobotCentric extends LinearOpMode {
             telemetry.update();
 
             bot.lifter.printDebug(telemetry);
-            bot.arm.printDebug(telemetry);
+            bot.left_armservo.printDebug(telemetry);
 
             controller1Actions();
             controller2Actions();

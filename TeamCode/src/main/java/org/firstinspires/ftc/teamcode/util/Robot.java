@@ -26,6 +26,15 @@ public class Robot {
     public boolean debugMode = false;
 
     public boolean isHanged = false;
+    public final NEWArm left_armservo;
+    public final NEWArm right_armservo;
+    public final NewIntake s_angleAdjust_broom;
+    public final NewIntake broom;
+    public final Outtake s_angleAdjust;
+    public final Outtake s_outtakeAngleAdjust;
+
+    public final Outtake outtake;
+
     public enum RobotTeleOpStates {
         RUNNING, HANGING_MODE, WAITING, STANDBY
     }
@@ -50,6 +59,13 @@ public class Robot {
         //camera = new Camera(hardwareMap, "cam");
         launcher = new PlaneLauncher(hardwareMap);
         intake = new Intake(hardwareMap);
+        left_armservo = new NEWArm(hardwareMap);
+        right_armservo = new NEWArm(hardwareMap);
+        s_angleAdjust = new Outtake(hardwareMap);
+        s_outtakeAngleAdjust = new Outtake(hardwareMap);
+        outtake = new Outtake(hardwareMap);
+        s_angleAdjust_broom = new NewIntake(hardwareMap);
+        broom = new NewIntake(hardwareMap);
     }
 
     public void update(){

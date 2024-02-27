@@ -36,7 +36,7 @@ public class Intake {
 
     //am modificat la collect, pt ca voiam sa vedem daca cu o discrepanta de puteri putem sa luam pixelii mai bine de jos,
     //in fact merge. Acum ia pixelii foarte constant direct in intake, fara sa trebuiasca sa dea afara si sa ia iar, also ia mai
-    //bine din stack
+    //bine din stackIntake
 
     public void startCollect(){
         interruptCRSScheduler();
