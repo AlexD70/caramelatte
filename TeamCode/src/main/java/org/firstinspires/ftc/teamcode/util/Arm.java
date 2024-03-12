@@ -2,143 +2,71 @@ package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
 
-import  com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.lib.ArmControllerPID;
 
-public class Arm {
-    protected DcMotorEx m_armMotor;
-
-    private int armPosition = 0, armTarget = 0, lastArmTarget = 0;
-    private final double kP = 0.0035, kD = 0, kI = 0.00001, kCos = 0.1;
-    private final ArmControllerPID pid = new ArmControllerPID(kP, kD, kI, kCos);
-    private boolean armInManual = false, isBusy = false; // manual actually means dont use encoders
-    private double manualArmPower = 0, power = 0;
-
-    // ======================== ARM - MOTOR ========================
+public class Arm implements Mechanism {
+    protected Servo left_armServo;
+    protected Servo right_armServo;
 
     public Arm(@NonNull HardwareMap hwmap){
-        m_armMotor = hwmap.get(DcMotorEx.class, HardwareConfig.ARM);
-        m_armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        m_armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        m_armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        m_armMotor.setDirection(DcMotorSimple.Direction.REVERSE); // use this to have positive state positions
-
-        pid.setPowerLimits(-0.7, 0.7);
+        left_armServo = hwmap.get(Servo.class, HardwareConfig.ARM);
+        right_armServo = hwmap.get(Servo.class, HardwareConfig.ARM);
+        left_armServo.setPosition(0);
+        right_armServo.setDirection(Servo.Direction.REVERSE);
+        right_armServo.setPosition(0);
     }
 
     public enum ArmPositions {
-        INIT(0), COLLECT(0), PLACE(1800), PRELOAD_PLACE(1800), PLACE_AUTO(1600), HANG(1200), MANUAL(-1), NO_ENCODER(-2);
+        INIT(0), COLLECT(0), PLACE(0.8), MANUAL(-1);
 
-        public int pos;
+        public double pos;
 
-        ArmPositions(int pos) {
+        ArmPositions(double pos) {
             this.pos = pos;
         }
     }
     private ArmPositions currentState = ArmPositions.INIT;
+    private double currentPos = 0;
 
-    private int deltaTicks = 0;
-    public void setStartPosition(int pos){
-        deltaTicks = pos;
+    public void setPosition(@NonNull ArmPositions position){
+        setPosition(position.pos);
     }
 
-    public final static double TICKS_TO_RAD = Math.PI * 2 / (28 * 103.8), INIT_RAD = -Math.PI/3;
-    public double getApproximateAngle(){
-        return TICKS_TO_RAD * getArmPosition() + INIT_RAD;
+    public void setPosition(double target){
+        left_armServo.setPosition(target);
+        right_armServo.setPosition(target);
+        currentPos = target;
     }
 
-    public ArmPositions getArmState(){
-        return currentState;
+    public double getPositionDouble(){
+        return currentPos;
     }
 
-    public int getArmPosition(){
-        return armPosition;
+    @Override
+    public void update(){}
+
+    @Override
+    public int getPosition() {
+        return (int) currentPos * 10;
     }
 
-    public boolean isArmBusy(){
-        return isBusy && currentState != ArmPositions.MANUAL;
+    @Override
+    public boolean isBusy() {
+        return false;
     }
 
-    private int ticksOnLastUpdateCall = armPosition;
-    private ElapsedTime timer = new ElapsedTime();
-    public void update(Telemetry telemetry){
-        armPosition = m_armMotor.getCurrentPosition();
-
-        if(!armInManual) {
-            if(armTarget != lastArmTarget){
-                pid.setTarget(armTarget);
-                pid.resetSum();
-                isBusy = true;
-                timer.reset();
-
-                lastArmTarget = armTarget;
-            }
-
-            if(ticksOnLastUpdateCall == armPosition && timer.seconds() > 1){
-                isBusy = false; // fix busy function to return false if arm not moving at all
-                timer.reset();
-            }
-
-            if(Math.abs(armTarget - armPosition) > 10 && (isBusy || currentState == ArmPositions.MANUAL)){
-                double pow = pid.update(armPosition, getApproximateAngle(), telemetry);
-                power = pow;
-                m_armMotor.setPower(pow);
-            } else if (Math.abs(armTarget - armPosition) < 10){
-                isBusy = false;
-                power = 0;
-                m_armMotor.setPower(0);
-            }
-        } else {
-            m_armMotor.setPower(manualArmPower);
-            power = manualArmPower;
-        }
-
-        ticksOnLastUpdateCall = armPosition;
+    @Override
+    public void setTarget(int target) {
+        throw new RuntimeException("Use setTarget(double) for the Arm!");
     }
 
-    public void setArmTarget(int target){
-        if(armInManual){
-            return;
-        }
-        armTarget = target;
-        currentState = ArmPositions.MANUAL;
-    }
-
-    public void setArmTarget(ArmPositions target){
-        if(armInManual){
-            return;
-        }
-        armTarget = target.pos;
-        currentState = target;
-    }
-
-    public void forceArmToPosition(int position){
-        setArmTarget(position);
-        currentState = ArmPositions.MANUAL;
-    }
-
-    public void noEncoderMode_setArmPower(double pow){
-        manualArmPower = pow;
-    }
-
-    // once entered, there is no way to go back
-    public void enterNoEncoderMode(){
-        armInManual = true;
-        currentState = ArmPositions.NO_ENCODER;
-    }
-
+    @Override
    public void printDebug(@NonNull Telemetry telemetry){
-        telemetry.addData("Arm position", armPosition);
-        telemetry.addData("Arm target", armTarget);
-        telemetry.addData("Arm power", power);
+        telemetry.addData("Arm position", currentPos);
         telemetry.addData("Arm state", currentState);
    }
 }

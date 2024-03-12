@@ -2,114 +2,86 @@ package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Intake {
-    protected CRServo crs_leftGecko, crs_rightGecko;
-    protected Servo s_angleAdjust;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-    private Thread crsSchedulerThread = new Thread();
+public class Intake implements Mechanism {
+    protected Servo s_angleAdjust_broom;
+    protected DcMotorEx broomMotor;
+    private int broomRunning = 0;
 
     public Intake(@NonNull HardwareMap hwmap){
-        crs_leftGecko = hwmap.get(CRServo.class, HardwareConfig.CRS_LEFT);
-        crs_rightGecko = hwmap.get(CRServo.class, HardwareConfig.CRS_RIGHT);
-        s_angleAdjust = hwmap.get(Servo.class, HardwareConfig.ANGLE_ADJUST);
-        crs_leftGecko.setPower(0);
-        crs_rightGecko.setPower(0);
+        broomMotor = hwmap.get(DcMotorEx.class, HardwareConfig.BROOM);
+        s_angleAdjust_broom = hwmap.get(Servo.class, HardwareConfig.ANGLE_ADJUST_BROOM);
+        stopCollect();
+        s_angleAdjust_broom.setPosition(0);
     }
-
-    // ===================== CRS ======================
-
-    public void setCRSPowers(double power){
-        crs_leftGecko.setPower(power);
-        crs_rightGecko.setPower(-power);
-    }
-
-
-    public void startEject(){
-        interruptCRSScheduler();
-        setCRSPowers(-0.55);
-    }
-
-
-    //am modificat la collect, pt ca voiam sa vedem daca cu o discrepanta de puteri putem sa luam pixelii mai bine de jos,
-    //in fact merge. Acum ia pixelii foarte constant direct in intake, fara sa trebuiasca sa dea afara si sa ia iar, also ia mai
-    //bine din stackIntake
 
     public void startCollect(){
-        interruptCRSScheduler();
-//        setCRSPowers(.55);
-        crs_leftGecko.setPower(0.1);
-        crs_rightGecko.setPower(-1);
+        broomMotor.setPower(0.9);
+        broomRunning = 1;
+    }
+
+    public void startEject(){
+        broomMotor.setPower(-0.9);
+        broomRunning = -1;
     }
 
     public void stopCollect(){
-        interruptCRSScheduler();
-        setCRSPowers(0);
+        broomMotor.setPower(0);
+        broomRunning = 0;
     }
 
-    public void startCollectFast(){
-        interruptCRSScheduler();
-        setCRSPowers(.9);
+    // METHOD IMPLEMENTATIONS
+
+    @Override
+    public int getPosition() {
+        return 0;
     }
 
-    public void startEjectFast(){
-        interruptCRSScheduler();
-        setCRSPowers(-0.75);
+    @Override
+    public boolean isBusy() {
+        return false;
     }
 
-    public void dropBothPixels() {
-        interruptCRSScheduler();
-        crsSchedulerThread = new Thread(() -> {
-            setCRSPowers(-0.5);
+    @Override
+    public void setTarget(int target) {
 
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            setCRSPowers(0);
-        });
-
-        crsSchedulerThread.start();
     }
 
-    public void dropPixel() throws InterruptedException{
-        interruptCRSScheduler();
-        setCRSPowers(-0.5);
-        Thread.sleep(500);
-        setCRSPowers(0);
+    @Override
+    public void printDebug(Telemetry telemetry) {
+        telemetry.addData("broom state", broomCurrentState);
+        telemetry.addData("broom pos", broomPos);
+        telemetry.addData("broom running", broomRunning);
     }
 
-    public void interruptCRSScheduler() {
-        crsSchedulerThread.interrupt();
-        try {
-            crsSchedulerThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+    @Override
+    public void update() {}
 
     // ====================== ANGLE ADJUST =====================
 
-    public enum AngleAdjustStates {
-        INIT(0d), COLLECT_POS(0.3), PLACE_POS(.9), NEUTRAL(.8), MANUAL(-1);
+    public enum BroomStates {
+        INIT(0.3), COLLECT_POS(.8), NEUTRAL(.3), MANUAL(-1);
 
-        public double val;
-        AngleAdjustStates(double val){this.val = val;}
+        public double pos;
+        BroomStates(double val){this.pos = val;}
     }
-    private AngleAdjustStates currentState = AngleAdjustStates.INIT;
+    private BroomStates broomCurrentState = BroomStates.INIT;
+    private double broomPos = 0;
 
-    public void toAngle(AngleAdjustStates state){
-        s_angleAdjust.setPosition(state.val);
-        currentState = state;
+    public void setPosition(BroomStates state){
+        setPosition(state.pos);
+        broomCurrentState = state;
     }
 
-    public void forceAngleServoPos(double pos){
-        s_angleAdjust.setPosition(pos);
-        currentState = AngleAdjustStates.MANUAL;
+    public void setPosition(double pos){
+        s_angleAdjust_broom.setPosition(pos);
+        broomPos = pos;
+        broomCurrentState = BroomStates.MANUAL;
     }
+
 }
