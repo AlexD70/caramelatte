@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.lib;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.util.Updateable;
+
 // V2
 
-public class Controller {
+public class Controller implements Updateable {
     private final Gamepad g;
 
     public Button square, circle, cross, triangle, share, options;
