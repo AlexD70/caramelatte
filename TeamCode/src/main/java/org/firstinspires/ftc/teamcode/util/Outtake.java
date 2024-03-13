@@ -44,7 +44,7 @@ public class Outtake {
     // ====================== OUTTAKE ANGLE ADJUST =====================
 
     public enum OUTTAKE_AngleAdjustStates {
-        INIT(0d), COLLECT_POS(0.3), PLACE(.9), MANUAL(-1);
+        INIT(1d), COLLECT_POS(1), PLACE(.3), MANUAL(-1);
 
         public double val;
         OUTTAKE_AngleAdjustStates(double val){this.val = val;}
@@ -58,7 +58,7 @@ public class Outtake {
 
     // ====================== ANGLE ADJUST =====================
     public enum AngleAdjustStates {
-        INIT(0d), LEFT(0.3), RIGHT(.9), MANUAL(-1);
+        INIT(0.468d), LEFT(0.3), RIGHT(0.636), MANUAL(-1);
 
         public double val;
         AngleAdjustStates(double val){this.val = val;}
