@@ -13,12 +13,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.PID;
 import org.firstinspires.ftc.teamcode.lib.PIDF;
 
-public class Lifter {
+public class Lifter implements Mechanism {
     protected DcMotorEx m_left, m_right;
 
-    // lower kP until lifter is no longer spasming around targetrget position
-    private final double kP = 0.004d, kD = 0d, kI = 0.00001d;
-    private final Supplier<Double> kF = () -> 0.02d;
+    private final double kP = 0.0025d, kD = 0d, kI = 0.00035d;
+    private final Supplier<Double> kF = () -> 0.042d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
 
     public Lifter(@NonNull HardwareMap hwmap){
@@ -31,8 +30,8 @@ public class Lifter {
         m_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        m_right.setDirection(DcMotorSimple.Direction.REVERSE);
-        m_left.setDirection(DcMotorSimple.Direction.FORWARD);
+        m_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        m_left.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void reset(){
@@ -42,8 +41,8 @@ public class Lifter {
         m_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         m_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        m_right.setDirection(DcMotorSimple.Direction.REVERSE);
-        m_left.setDirection(DcMotorSimple.Direction.FORWARD);
+        m_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        m_left.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public enum LifterStates {
@@ -127,8 +126,19 @@ public class Lifter {
         }
     }
 
+    @Override
+    public int getPosition() {
+        return 0;
+    }
+
+    @Override
     public boolean isBusy(){
         return (Math.abs(currentPosition - target) > 20) && (lifterState != LifterStates.MANUAL);
+    }
+
+    @Override
+    public void setTarget(int target) {
+
     }
 
     public void printDebug(@NonNull Telemetry telemetry){
