@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.lib.PID;
 import org.firstinspires.ftc.teamcode.lib.PIDF;
 
 public class Lifter implements Mechanism {
@@ -19,6 +19,7 @@ public class Lifter implements Mechanism {
     private final double kP = 0.0025d, kD = 0d, kI = 0.00035d;
     private final Supplier<Double> kF = () -> 0.042d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
+    public boolean isInAuto = false;
 
     public Lifter(@NonNull HardwareMap hwmap){
         m_left = hwmap.get(DcMotorEx.class, HardwareConfig.LIFTER_LEFT);
@@ -45,6 +46,10 @@ public class Lifter implements Mechanism {
         m_left.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public void setAuto(){
+        isInAuto = true;
+    }
+
     public enum LifterStates {
         INIT(0), DOWN(0), MID(1000), HIGH(1500), ULTRA_HIGH(2100), HANG(600), MANUAL(-1), NO_ENCODER(-2);
 
@@ -56,15 +61,15 @@ public class Lifter implements Mechanism {
     public int lastTarget = 0, target = 0, currentPosition = 0;
     public double power = 0;
 
-    public int getPos(){
+    public int getPosition(){
         return currentPosition;
     }
 
-    public void goToPos(int x){
+    public void setTarget(int x){
         lifterState = LifterStates.MANUAL;
-        target = x;
+        target = Math.min(x, 3400);
     }
-    public void goToPos(@NonNull LifterStates state){
+    public void setTarget(@NonNull LifterStates state){
         lifterState = state;
         target = state.pos;
     }
@@ -79,16 +84,19 @@ public class Lifter implements Mechanism {
         keepDown = false;
     }
 
-    public void goDownExtraVoltage(){
+    @Deprecated public void goDownExtraVoltage(){
         pidf.kP = 0.0028;
         pidf.kI = 0.00009;
         pidf.resetIntegral();
-        goToPos(LifterStates.DOWN);
+        setTarget(LifterStates.MID);
     }
+
 
     public double velocity = 0, acceleration = 0, lastVel = 0;
     public int lastPosition = 0, dtheta = 0;
     private ElapsedTime dtTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+    @Override
     public void update(){
         double dt = dtTimer.seconds();
         lastPosition = currentPosition;
@@ -103,12 +111,6 @@ public class Lifter implements Mechanism {
         if(keepDown){
             m_left.setPower(downPow);
             m_right.setPower(downPow);
-            return;
-        }
-
-        if(currentPosition > 2400){
-            m_left.setPower(0);
-            m_right.setPower(0);
             return;
         }
 
@@ -127,20 +129,11 @@ public class Lifter implements Mechanism {
     }
 
     @Override
-    public int getPosition() {
-        return 0;
-    }
-
-    @Override
     public boolean isBusy(){
-        return (Math.abs(currentPosition - target) > 20) && (lifterState != LifterStates.MANUAL);
+        return (Math.abs(currentPosition - target) > 50) && ((lifterState != LifterStates.MANUAL) || isInAuto);
     }
 
     @Override
-    public void setTarget(int target) {
-
-    }
-
     public void printDebug(@NonNull Telemetry telemetry){
         telemetry.addData("Lifter position", currentPosition);
         telemetry.addData("Lifter target", target);

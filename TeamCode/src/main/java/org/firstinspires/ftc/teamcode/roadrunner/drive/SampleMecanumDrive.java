@@ -43,7 +43,7 @@ import java.util.List;
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class SampleMecanumDrive3 extends MecanumDrive {
+public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(9, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
@@ -74,7 +74,7 @@ public class SampleMecanumDrive3 extends MecanumDrive {
 //        this.telemetry = telemetry;
 //    }
 
-    public SampleMecanumDrive3(HardwareMap hardwareMap) {
+    public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic, DriveConstants.TRACK_WIDTH, DriveConstants.TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
@@ -89,7 +89,7 @@ public class SampleMecanumDrive3 extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        /*imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
@@ -115,18 +115,23 @@ public class SampleMecanumDrive3 extends MecanumDrive {
         //
         // For example, if +Y in this diagram faces downwards, you would use AxisDirection.NEG_Y.
         // BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_Y);
-        */
-        LF = hardwareMap.get(DcMotorEx.class, "LF");
-        LB = hardwareMap.get(DcMotorEx.class, "LB");
-        RB = hardwareMap.get(DcMotorEx.class, "RB");
-        RF = hardwareMap.get(DcMotorEx.class, "RF"); //done
+
+        LF = hardwareMap.get(DcMotorEx.class, "RB");
+        LB = hardwareMap.get(DcMotorEx.class, "RF");
+        RB = hardwareMap.get(DcMotorEx.class, "LF");
+        RF = hardwareMap.get(DcMotorEx.class, "LB"); //done
 //good version
-        LF.setDirection(DcMotorSimple.Direction.REVERSE);
-        LB.setDirection(DcMotorSimple.Direction.REVERSE);
+//        LF.setDirection(DcMotorSimple.Direction.REVERSE);
+//        LB.setDirection(DcMotorSimple.Direction.REVERSE);
 //        RF.setDirection(DcMotorSimple.Direction.FORWARD);
 //        RB.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //reversed version
+
+        LF.setDirection(DcMotorSimple.Direction.REVERSE); //????
+        LB.setDirection(DcMotorSimple.Direction.REVERSE);
+        RF.setDirection(DcMotorSimple.Direction.FORWARD);
+        RB.setDirection(DcMotorSimple.Direction.FORWARD);
 
         motors = Arrays.asList(LF, LB, RB, RF);
 
@@ -302,21 +307,19 @@ public class SampleMecanumDrive3 extends MecanumDrive {
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         LF.setPower(v);
         LB.setPower(v1);
-        RF.setPower(v3);
         RB.setPower(v2);
+        RF.setPower(v3);
     }
 
     @Override
     public double getRawExternalHeading() {
-//        return imu.getAngularOrientation().firstAngle;
-        return 0;
+        return imu.getAngularOrientation().firstAngle;
 
     }
 
     @Override
     public Double getExternalHeadingVelocity() {
-//        return (double) imu.getAngularVelocity().zRotationRate;
-        return 0.0;
+        return (double) imu.getAngularVelocity().zRotationRate;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {

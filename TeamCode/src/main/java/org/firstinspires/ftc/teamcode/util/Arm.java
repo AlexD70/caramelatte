@@ -16,12 +16,12 @@ public class Arm implements Mechanism {
         left_armServo = hwmap.get(Servo.class, HardwareConfig.ARM_LEFT);
         right_armServo = hwmap.get(Servo.class, HardwareConfig.ARM_RIGHT);
         right_armServo.setDirection(Servo.Direction.REVERSE);
-        right_armServo.setPosition(1);
-        left_armServo.setPosition(1);
+        right_armServo.setPosition(0.96);
+        left_armServo.setPosition(0.96);
     }
 
     public enum ArmPositions {
-        INIT(1), COLLECT(1), PLACE(0.3), MANUAL(-1);
+        INIT(1), COLLECT(0.95), PLACE(0.3), MANUAL(-1);
 
         public double pos;
 

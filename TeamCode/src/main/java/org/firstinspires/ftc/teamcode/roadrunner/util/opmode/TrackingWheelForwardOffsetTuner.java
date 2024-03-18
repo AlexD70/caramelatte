@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.roadrunner.drive.opmode;
+package org.firstinspires.ftc.teamcode.roadrunner.util.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.util.MovingStatistics;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive3;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer2;
 
 /**
  * This routine determines the effective forward offset for the lateral tracking wheel.
@@ -44,9 +44,9 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        SampleMecanumDrive3 drive = new SampleMecanumDrive3(hardwareMap);
 
-        if (!(drive.getLocalizer() instanceof StandardTrackingWheelLocalizer)) {
+        if (!(drive.getLocalizer() instanceof StandardTrackingWheelLocalizer2)) {
             RobotLog.setGlobalErrorMsg("StandardTrackingWheelLocalizer is not being set in the "
                     + "drive class. Ensure that \"setLocalizer(new StandardTrackingWheelLocalizer"
                     + "(hardwareMap));\" is called in SampleMecanumDrive.java");
@@ -82,7 +82,7 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
                 drive.update();
             }
 
-            double forwardOffset = StandardTrackingWheelLocalizer.FORWARD_OFFSET +
+            double forwardOffset = StandardTrackingWheelLocalizer2.FORWARD_OFFSET +
                     drive.getPoseEstimate().getY() / headingAccumulator;
             forwardOffsetStats.add(forwardOffset);
 

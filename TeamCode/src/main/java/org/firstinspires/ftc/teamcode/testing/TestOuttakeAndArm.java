@@ -12,7 +12,7 @@ public class TestOuttakeAndArm extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Arm arm = new Arm(hardwareMap);
+//        Arm arm = new Arm(hardwareMap);
         Outtake outtake = new Outtake(hardwareMap);
         Controller ctrl1 = new Controller(gamepad1);
 
@@ -20,19 +20,19 @@ public class TestOuttakeAndArm extends LinearOpMode {
 
         while(opModeIsActive()){
             ctrl1.update();
-            arm.update();
+//            arm.update();
             outtake.update();
 
             if(ctrl1.cross.isPressed()){
-                outtake.gearToPos(Outtake.GearStates.COLLECT);
+                outtake.dropBothPixels();
                 sleep(300);
-                arm.setPosition(Arm.ArmPositions.COLLECT);
+//                arm.setPosition(Arm.ArmPositions.COLLECT);
             }
 
             if(ctrl1.circle.isPressed()){
-                outtake.gearToPos(Outtake.GearStates.PLACE);
+                outtake.catchPixels();
                 sleep(300);
-                arm.setPosition(Arm.ArmPositions.PLACE);
+//                arm.setPosition(Arm.ArmPositions.PLACE);
             }
         }
     }

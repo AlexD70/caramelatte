@@ -15,6 +15,7 @@ public class ProgramServo extends LinearOpMode {
     // 0.15 - gear servo place position
     // 0.4 - avion armat
     // 0.6 lansare avion
+
     @Override
     public void runOpMode() throws InterruptedException {
         Servo servoLeft = hardwareMap.get(Servo.class, "launcher");

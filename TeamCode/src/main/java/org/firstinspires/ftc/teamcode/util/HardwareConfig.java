@@ -10,7 +10,7 @@ public class HardwareConfig {
     public final static String BOX_ROTATION = "rotate";
     public final static String GEAR_SERVO = "gear";
 
-    public final static String LAUNCHER = "LAUNCH";
+    public final static String LAUNCHER = "launcher";
     public final static String LIFTER_RIGHT = "lifter right", LIFTER_LEFT = "lifter left";
     public final static String RF = "RF", RB = "RB", LF = "LF", LB = "LB";
     public final static String ODO_LEFT = "LF", ODO_RIGHT = "RB", ODO_PERP = "LB";

@@ -87,6 +87,8 @@ public class Controller implements Updateable {
     public boolean isRightTriggerDown(){
         return rtrigcounter > 0;
    }
+    public boolean isRightTriggerReleased(){ return !(rightTrigger > rtrigthresh) && rtrigcounter > 0; }
+    public boolean isLeftTriggerReleased(){ return !(leftTrigger > ltrigthresh) && ltrigcounter > 0; }
 
     public boolean isRightTriggerPressed(){
         return rtrigcounter == 1;

@@ -14,30 +14,29 @@ public class Outtake implements Mechanism{
     protected Servo right_miniClaw;
 
     public Outtake(@NonNull HardwareMap hwmap){
-//        left_miniClaw = hwmap.get(Servo.class, HardwareConfig.CLAW_LEFT);
-//        right_miniClaw = hwmap.get(Servo.class, HardwareConfig.CLAW_RIGHT);
+        left_miniClaw = hwmap.get(Servo.class, HardwareConfig.CLAW_LEFT);
+        right_miniClaw = hwmap.get(Servo.class, HardwareConfig.CLAW_RIGHT);
         s_rotateBox = hwmap.get(Servo.class, HardwareConfig.BOX_ROTATION);
         s_outtakeGear = hwmap.get(Servo.class, HardwareConfig.GEAR_SERVO);
-//        left_miniClaw.setPosition(0);
-//        right_miniClaw.setPosition(0);
+        catchPixels();
         s_rotateBox.setPosition(0.52);
-        s_outtakeGear.setPosition(0.65);
+        s_outtakeGear.setPosition(0.8);
     }
 
 
     // ====================== OUTTAKE CLAWS =====================
 
-    public void catchPixels() {
-        left_miniClaw.setPosition(1);
-        right_miniClaw.setPosition(1);
-    }
     public void dropBothPixels() {
-        left_miniClaw.setPosition(0);
-        right_miniClaw.setPosition(0);
+        left_miniClaw.setPosition(1);
+        right_miniClaw.setPosition(0.2);
+    }
+    public void catchPixels() {
+        left_miniClaw.setPosition(0.3);
+        right_miniClaw.setPosition(0.8);
     }
 
     public void dropLeftPixel() throws InterruptedException{
-        left_miniClaw.setPosition(0);
+        left_miniClaw.setPosition(1);
     }
 
     public void dropRightPixel() throws InterruptedException{
@@ -72,7 +71,7 @@ public class Outtake implements Mechanism{
     // ====================== BOX ROTATION =====================
 
     public enum BoxRotationStates {
-        INIT(.52), COLLECT_POS(.52), PLACE(.3), MANUAL(-1);
+        INIT(.52), COLLECT_POS(.52), MANUAL(-1);
 
         public double val;
         BoxRotationStates(double val){this.val = val;}

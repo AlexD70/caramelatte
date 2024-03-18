@@ -18,6 +18,7 @@ public class TestIntake extends LinearOpMode {
         bot.init(hardwareMap);
         ctrl1 = new Controller(gamepad1);
         ctrl2 = new Controller(gamepad2);
+        bot.outtake.dropBothPixels();
 
         waitForStart();
 

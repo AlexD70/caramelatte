@@ -21,12 +21,12 @@ public class Intake implements Mechanism {
     }
 
     public void startCollect(){
-        broomMotor.setPower(0.9);
+        broomMotor.setPower(-0.9);
         broomRunning = 1;
     }
 
     public void startEject(){
-        broomMotor.setPower(-0.9);
+        broomMotor.setPower(0.9);
         broomRunning = -1;
     }
 

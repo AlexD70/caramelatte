@@ -23,13 +23,13 @@ public class TestLifter extends LinearOpMode {
             lift.update();
             ctrl1.update();
             if(ctrl1.dpadUp.isPressed()){
-                lift.goToPos(2000);
+                lift.setTarget(2000);
             } else if(ctrl1.dpadDown.isPressed()){
-                lift.goToPos(0);
+                lift.setTarget(0);
             } else if(ctrl1.dpadLeft.isPressed()){
-                lift.goToPos(1000);
+                lift.setTarget(1000);
             } else if(ctrl1.dpadRight.isPressed()){
-                lift.goToPos(3000);
+                lift.setTarget(3000);
             }
 
             lift.printDebug(telemetry);
