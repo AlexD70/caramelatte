@@ -32,26 +32,26 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double WHEEL_RADIUS = 0.6889764; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 12.96;//13.14961; //3.9042; //32.5 CM distance between the left and right wheels
-    public static double FORWARD_OFFSET = 5.3;//5.51181;//4.7244; // in;
+    public static double LATERAL_DISTANCE = 10.23;
+    public static double FORWARD_OFFSET = 4.9;
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
         super(Arrays.asList(
-                new Pose2d(0.61, LATERAL_DISTANCE / 2, 0), // left
-                new Pose2d(-1.91, -LATERAL_DISTANCE / 2, 0), // right
-                new Pose2d(FORWARD_OFFSET, -1.65354, Math.toRadians(90)) // front
+                new Pose2d(-1.77, LATERAL_DISTANCE / 2, 0), // left
+                new Pose2d(-1.77, -LATERAL_DISTANCE / 2, 0), // right
+                new Pose2d(-FORWARD_OFFSET, 0, Math.toRadians(90)) // front
         ));
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RF"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LF"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "broom"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "lifter right"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RB"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
-//        leftEncoder.setDirection(Encoder.Direction.REVERSE);
+        leftEncoder.setDirection(Encoder.Direction.REVERSE);
         rightEncoder.setDirection(Encoder.Direction.REVERSE);
-//        frontEncoder.setDirection(Encoder.Direction.REVERSE);
+        frontEncoder.setDirection(Encoder.Direction.REVERSE);
     }
 
     public static double encoderTicksToInches(double ticks) {
