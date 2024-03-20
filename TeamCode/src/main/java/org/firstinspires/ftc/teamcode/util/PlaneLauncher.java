@@ -12,11 +12,11 @@ public class PlaneLauncher implements Mechanism{
 
     public PlaneLauncher(@NonNull HardwareMap hwmap){
         s_launcher = hwmap.get(Servo.class, HardwareConfig.LAUNCHER);
-        s_launcher.setPosition(0.6);
+        s_launcher.setPosition(0.4);
     }
 
     public void launchPlane(){
-        s_launcher.setPosition(0);
+        s_launcher.setPosition(0.8);
     }
 
     @Override

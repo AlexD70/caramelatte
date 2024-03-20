@@ -71,7 +71,7 @@ public class Outtake implements Mechanism{
     // ====================== BOX ROTATION =====================
 
     public enum BoxRotationStates {
-        INIT(.52), COLLECT_POS(.52), MANUAL(-1);
+        INIT(.52), COLLECT_POS(.52), RIGHT(0.3), LEFT(0.74), MANUAL(-1);
 
         public double val;
         BoxRotationStates(double val){this.val = val;}
@@ -83,6 +83,9 @@ public class Outtake implements Mechanism{
         currentBoxRotation = state;
     }
 
+    public void rotateToPos(double pos){
+        s_rotateBox.setPosition(pos);
+    }
     public void rotateToAngleManual(double pos){
         s_rotateBox.setPosition(pos);
         currentBoxRotation = BoxRotationStates.MANUAL;
