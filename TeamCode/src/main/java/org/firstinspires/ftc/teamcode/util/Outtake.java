@@ -20,7 +20,7 @@ public class Outtake implements Mechanism{
         s_outtakeGear = hwmap.get(Servo.class, HardwareConfig.GEAR_SERVO);
         catchPixels();
         s_rotateBox.setPosition(0.52);
-        s_outtakeGear.setPosition(0.8);
+        s_outtakeGear.setPosition(0.75);
     }
 
 
