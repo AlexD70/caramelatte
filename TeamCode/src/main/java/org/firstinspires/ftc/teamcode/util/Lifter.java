@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.lib.PIDF;
 public class Lifter implements Mechanism {
     protected DcMotorEx m_left, m_right;
 
-    private final double kP = 0.0025d, kD = 0d, kI = 0.00035d;
+    private final double kP = 0.0025d, kD = 0d, kI = 0.00045d;
     private final Supplier<Double> kF = () -> 0.042d;
     private final PIDF pidf = new PIDF(kP, kD, kI, kF);
     public boolean isInAuto = false;

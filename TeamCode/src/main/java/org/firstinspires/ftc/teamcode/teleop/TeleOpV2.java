@@ -13,16 +13,17 @@ import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.Robot;
 
 @TeleOp
-public class TeleOpV1 extends LinearOpMode {
+public class TeleOpV2 extends LinearOpMode {
     Robot bot = new Robot();
     Controller ctrl1, ctrl2;
 
     public double weight = 1;
     public boolean isInPlaceMode = false;
+    public boolean isCollecting = false;
     public boolean pixelsLocked = false;
 
     public boolean isLimited = true;
-    public static double LIFTER_MANUAL_WEIGHT = 14, LIFTER_MANUAL_THRESH = 0.2;
+    public static double LIFTER_MANUAL_WEIGHT = 16, LIFTER_MANUAL_THRESH = 0.2;
     public void overrideLimits(boolean button){
         if(button){
             isLimited = false;
@@ -48,7 +49,7 @@ public class TeleOpV1 extends LinearOpMode {
             }
             deltaLifter += movement * LIFTER_MANUAL_WEIGHT;
             if(isLimited) {
-                bot.lift.setTarget(Range.clip((int) (lifterInitial + deltaLifter), 0, 2400));
+                bot.lift.setTarget(Range.clip((int) (lifterInitial + deltaLifter), 0, 2800));
             } else {
                 bot.lift.setTarget((int)(lifterInitial + deltaLifter));
             }
@@ -64,11 +65,18 @@ public class TeleOpV1 extends LinearOpMode {
         ctrl1 = new Controller(gamepad1);
         ctrl2 = new Controller(gamepad2);
 
+        bot.outtake.dropBothPixels();
+
         MiscActions.bulkSetThreshes(ctrl1, ctrl2, 0.4);
 
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()){
+            if(bot.intake.getPosition() != -1 && isInPlaceMode){
+                bot.intake.setPosition(Intake.BroomStates.NEUTRAL);
+                bot.intake.stopCollect();
+            }
+
             bot.printDebug(telemetry);
             MiscActions.bulkUpdate(ctrl1, ctrl2, bot, telemetry);
 
@@ -81,40 +89,74 @@ public class TeleOpV1 extends LinearOpMode {
 
             // to place state
             if(ctrl2.cross.isPressed()){
-                bot.outtake.catchPixels();
-                bot.arm.setPosition(Arm.ArmPositions.PLACE);
-                if(!isInPlaceMode) {
-                    bot.arm.setPosition(Arm.ArmPositions.PLACE);
-                    bot.lift.setTarget(2000);
-                    isInPlaceMode = true;
-                    sleep(300);
-                    bot.outtake.gearToPos(Outtake.GearStates.PLACE);
-                }
+                uniqueThread.interrupt();
+                uniqueThread = new Thread(() -> {
+                    if(!isInPlaceMode) {
+                        bot.outtake.catchPixels();
+                        pixelsLocked = true;
+                        sleep(300);
+                        if (Thread.currentThread().isInterrupted()) {
+                            return;
+                        }
+                        bot.arm.setPosition(Arm.ArmPositions.PLACE);
+                        bot.lift.setTarget(2000);
+                        sleep(300);
+                        if (Thread.currentThread().isInterrupted()) {
+                            return;
+                        }
+                        bot.outtake.gearToPos(Outtake.GearStates.PLACE);
+                        isInPlaceMode = true;
+                    }
+                });
+                uniqueThread.start();
             }
 
             // lifter high when in place
             if(ctrl2.dpadUp.isPressed()){
-                if(!isInPlaceMode) {
-                    bot.outtake.gearToPos(Outtake.GearStates.PLACE);
-                    sleep(300);
-                    bot.arm.setPosition(Arm.ArmPositions.PLACE);
-                    isInPlaceMode = true;
-                }
-                bot.lift.setTarget(2400);
+                uniqueThread.interrupt();
+                uniqueThread = new Thread(() -> {
+                    if (!isInPlaceMode) {
+                        bot.outtake.catchPixels();
+                        pixelsLocked = true;
+                        sleep(300);
+                        if(Thread.currentThread().isInterrupted()){
+                            return;
+                        }
+                        bot.outtake.gearToPos(Outtake.GearStates.PLACE);
+                        uniqueThread = new Thread(() -> {
+                            sleep(300);
+                            if(Thread.currentThread().isInterrupted()){
+                                return;
+                            }
+                            bot.arm.setPosition(Arm.ArmPositions.PLACE);
+                        });
+                        isInPlaceMode = true;
+                    }
+                    bot.lift.setTarget(2500);
+                });
+
+                uniqueThread.start();
             }
 
             // to collect state
             if(ctrl2.circle.isPressed()){
-                if(isInPlaceMode) {
-                    bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
-                    bot.outtake.gearToPos(Outtake.GearStates.COLLECT);
-                    sleep(300);
-                    bot.arm.setPosition(Arm.ArmPositions.COLLECT);
-                    isInPlaceMode = false;
-                    bot.outtake.dropBothPixels();
-                    pixelsLocked = false;
-                }
-                bot.lift.setTarget(0);
+                uniqueThread.interrupt();
+                uniqueThread = new Thread(() -> {
+                    if (isInPlaceMode) {
+                        bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
+                        bot.outtake.gearToPos(Outtake.GearStates.COLLECT);
+                        sleep(300);
+                        if(Thread.currentThread().isInterrupted()){
+                            return;
+                        }
+                        bot.lift.setTarget(0);
+                        bot.arm.setPosition(Arm.ArmPositions.COLLECT);
+                        bot.outtake.dropBothPixels();
+                        pixelsLocked = false;
+                        isInPlaceMode = false;
+                    }
+                });
+                uniqueThread.start();
             }
 
 
@@ -174,7 +216,9 @@ public class TeleOpV1 extends LinearOpMode {
 
             // hanging bot
             if(ctrl1.isLeftTriggerPressed()){
-                bot.lift.setTarget(600);
+                if(isInPlaceMode) {
+                    bot.lift.setTarget(600);
+                }
             }
 
             if(ctrl1.bumperRight.isPressed()){
