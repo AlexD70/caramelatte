@@ -34,10 +34,6 @@ public class RedBluePipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        if(kill){
-            return input;
-        }
-
         if(input.empty()){
             return input;
         }

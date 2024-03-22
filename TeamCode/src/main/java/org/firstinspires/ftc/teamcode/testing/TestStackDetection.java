@@ -67,9 +67,13 @@ public class TestStackDetection extends LinearOpMode {
 
 //        target = pipeline.targetFound;
 
+        while(opModeIsActive()){
+            telemetry.addData("redbluepipeline", pipeline.getCase());
+            telemetry.update();
+        }
+
         pipeline.killThis();
         webcam.stopStreaming();
         webcam.closeCameraDevice();
-        sleep(5000);
     }
 }

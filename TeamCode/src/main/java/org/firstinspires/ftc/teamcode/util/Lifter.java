@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.lib.PIDF;
 
 public class Lifter implements Mechanism {
     protected DcMotorEx m_left, m_right;
+    protected TouchSensor sensor;
 
     private final double kP = 0.0025d, kD = 0d, kI = 0.00045d;
     private final Supplier<Double> kF = () -> 0.042d;
@@ -24,6 +26,7 @@ public class Lifter implements Mechanism {
     public Lifter(@NonNull HardwareMap hwmap){
         m_left = hwmap.get(DcMotorEx.class, HardwareConfig.LIFTER_LEFT);
         m_right = hwmap.get(DcMotorEx.class, HardwareConfig.LIFTER_RIGHT);
+        sensor = hwmap.get(TouchSensor.class, "touch sensor");
 
         m_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         m_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -107,6 +110,13 @@ public class Lifter implements Mechanism {
         velocity = (currentPosition - lastPosition) / dt;
         acceleration = (velocity - lastVel) / dt;
         dtTimer.reset();
+
+        if(sensor.isPressed() && target < 0){
+            power = 0;
+            m_right.setPower(0);
+            m_left.setPower(0);
+            return;
+        }
 
         if(keepDown){
             m_left.setPower(downPow);
