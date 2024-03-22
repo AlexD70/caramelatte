@@ -39,7 +39,7 @@ public class RedPipeline extends OpenCvPipeline {
         MatOfPoint largestContour = null;
         double maxSize = 0;
         for(MatOfPoint contour : contours){
-            double area = Imgproc.contourArea(contour);
+            double area = Imgproc.contourArea(contour);:wq:wq:wq
             if (maxSize < area){
                 maxSize = area;
                 largestContour = contour;

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RedBluePipeline extends OpenCvPipeline {
+    // RED CLOSE: 0-center, right- -1 left-1 nothing- -2
+
     boolean kill = true;
     int stack = 0;
     boolean close = false;
@@ -44,7 +46,7 @@ public class RedBluePipeline extends OpenCvPipeline {
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
         Imgproc.medianBlur(input, input, 5);
 
-        int crop = 75;
+        int crop = 60;
         if(!close){
             crop = 125;
         }

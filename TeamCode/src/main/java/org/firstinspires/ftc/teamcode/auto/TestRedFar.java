@@ -30,7 +30,7 @@ public class TestRedFar extends LinearOpMode {
             splineVector2d = new Vector2d(30, 57.5);
             preloadAndCollect = bot.drive.trajectorySequenceBuilder(new Pose2d(62,-34,Math.toRadians(0)))
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(34, -22,Math.toRadians(150)),Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(34, -22,Math.toRadians(-30)),Math.toRadians(180))
                     .lineToLinearHeading(new Pose2d(12, -51.5,Math.toRadians(90)))
                     .addSpatialMarker(new Vector2d(12, -50), () -> {
                         bot.intake.setPosition(0.55);
