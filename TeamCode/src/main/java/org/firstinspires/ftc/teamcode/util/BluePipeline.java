@@ -46,7 +46,7 @@ public class BluePipeline extends OpenCvPipeline {
 
         int crop = 80;
         if(!close){
-            crop = 125;
+            crop = 60;
         }
         Point topLeft = new Point(0, crop);
         Point bottomRight =  new Point(320, 240);
@@ -95,12 +95,12 @@ public class BluePipeline extends OpenCvPipeline {
                 whichCase = 0;
             }
         } else {
-            if(target.x > 130){
-                whichCase = -1;
-            } else if (target.x < 130){
-                whichCase = 0;
+            if(target.x > 180){
+                whichCase = -1; // DREAPTA
+            } else if (target.x < 180){
+                whichCase = 0; // CENTRU
             } else if (target.area() < 50) {
-                whichCase = 1;
+                whichCase = 1; // -2 STANGA
             }
         }
 

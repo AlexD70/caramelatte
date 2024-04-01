@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -14,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.Arm;
 import org.firstinspires.ftc.teamcode.util.BluePipeline;
-import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.Robot;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -23,11 +18,10 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous
-public class TestBlueClose extends LinearOpMode {
+public class TestBlueCloseSafer extends LinearOpMode {
     Robot bot = new Robot();
     int caz = 3;//1- stanga, 2- centru, 3- dreapta
 
-    double admissibleErr = 5;
 
     OpenCvWebcam webcam;
     BluePipeline pipeline = new BluePipeline();
@@ -73,11 +67,6 @@ public class TestBlueClose extends LinearOpMode {
                             .splineToLinearHeading(new Pose2d(-43, 46, Math.toRadians(-90)), Math.toRadians(90))
                             .resetAccelConstraint()
                             .addSpatialMarker(new Vector2d(-43, 22), () -> {
-                                Pose2d errorPose = bot.drive.getLastError();
-                                double err = Math.sqrt(errorPose.getX() * errorPose.getX() + errorPose.getY() * errorPose.getY());
-                                if(err > admissibleErr){
-                                    return;
-                                }
                                 bot.arm.setPosition(Arm.ArmPositions.PLACE);
                                 bot.lift.setTarget(1000);
                                 sleep(300);
@@ -94,9 +83,9 @@ public class TestBlueClose extends LinearOpMode {
                     bot.arm.setPosition(0.96);
                     bot.lift.setTarget(0);
                 })
-                .splineToLinearHeading(new Pose2d(-55, 15, Math.toRadians(-90)), Math.toRadians(-90))
-                .lineToConstantHeading(new Vector2d(-55, -35))
-                .splineToLinearHeading(new Pose2d(-32, -61, Math.toRadians(-90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-54, 15, Math.toRadians(-90)), Math.toRadians(-90))
+                .lineToConstantHeading(new Vector2d(-54, -35))
+                .splineToLinearHeading(new Pose2d(-30, -60, Math.toRadians(-90)), Math.toRadians(-90))
                 .addSpatialMarker(new Vector2d(-34, -52), () -> {
                     bot.intake.setPosition(0.6);
                     bot.intake.startCollect();
@@ -127,9 +116,9 @@ public class TestBlueClose extends LinearOpMode {
                     bot.arm.setPosition(0.96);
                     bot.lift.setTarget(0);
                 })
-                .splineToLinearHeading(new Pose2d(-52, 15, Math.toRadians(-90)), Math.toRadians(-90))
-                .lineToConstantHeading(new Vector2d(-52, -35))
-                .splineToLinearHeading(new Pose2d(-32, -61, Math.toRadians(-90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-50, 15, Math.toRadians(-90)), Math.toRadians(-90))
+                .lineToConstantHeading(new Vector2d(-50, -35))
+                .splineToLinearHeading(new Pose2d(-50, -61, Math.toRadians(-90)), Math.toRadians(-90))
                 .addSpatialMarker(new Vector2d(-50, -55), () -> {
                     bot.intake.setPosition(0.7);
                     bot.intake.startCollect();
@@ -138,8 +127,8 @@ public class TestBlueClose extends LinearOpMode {
 
         toBackdropCycle2[caz] = bot.drive.trajectorySequenceBuilder(toStackCycle2[caz].end())
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-55, -36, Math.toRadians(-90)), Math.toRadians(90))
-                .lineToLinearHeading(new Pose2d(-55, 15, Math.toRadians(-90)))
+                .splineToLinearHeading(new Pose2d(-52, -36, Math.toRadians(-90)), Math.toRadians(90))
+                .lineToLinearHeading(new Pose2d(-52, 15, Math.toRadians(-90)))
                 .addSpatialMarker(new Vector2d(-35, 20), () -> {
                     bot.arm.setPosition(Arm.ArmPositions.PLACE);
                     bot.lift.setTarget(1500);
@@ -219,8 +208,8 @@ public class TestBlueClose extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .splineToLinearHeading(new Pose2d(-52, 15, Math.toRadians(-90)), Math.toRadians(-90))
-                    .lineToConstantHeading(new Vector2d(-52, -35))
+                    .splineToLinearHeading(new Pose2d(-48, 15, Math.toRadians(-90)), Math.toRadians(-90))
+                    .lineToConstantHeading(new Vector2d(-48, -35))
                     .splineToLinearHeading(new Pose2d(-28, -61, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(-28, -55), () -> {
                         bot.intake.setPosition(0.7);
@@ -277,7 +266,7 @@ public class TestBlueClose extends LinearOpMode {
                     })
                     .splineToLinearHeading(new Pose2d(-54, 15, Math.toRadians(-90)), Math.toRadians(-90))
                     .lineToConstantHeading(new Vector2d(-54, -35))
-                    .splineToLinearHeading(new Pose2d(-30, -60.5, Math.toRadians(-90)), Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(-29.5, -60.5, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(-36, -52), () -> {
                         bot.intake.setPosition(0.6);
                         bot.intake.startCollect();
@@ -294,7 +283,7 @@ public class TestBlueClose extends LinearOpMode {
                         sleep(100);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
-                    .splineToLinearHeading(new Pose2d(-27, 45.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-29, 45.5, Math.toRadians(-90)), Math.toRadians(90))
                     .build();
 
 
@@ -577,9 +566,18 @@ public class TestBlueClose extends LinearOpMode {
         telemetry.addLine("Helloo");
         telemetry.update();
 
-        cycleOne();
+        if(caz != 1) {
+            cycleOne();
 
-        cycleTwo();
+            cycleTwo();
+        } else {
+            bot.drive.followTrajectorySequenceAsync(parking[caz]);
+
+            while((bot.drive.isBusy() || bot.lift.isBusy()) && !isStopRequested()){
+                bot.drive.update();
+                bot.lift.update();
+            }
+        }
 
         webcam.closeCameraDevice();
     }

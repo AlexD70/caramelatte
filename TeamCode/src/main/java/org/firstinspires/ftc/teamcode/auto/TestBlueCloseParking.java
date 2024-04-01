@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -14,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.Arm;
 import org.firstinspires.ftc.teamcode.util.BluePipeline;
-import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.Robot;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -23,7 +18,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous
-public class TestBlueClose extends LinearOpMode {
+public class TestBlueCloseParking extends LinearOpMode {
     Robot bot = new Robot();
     int caz = 3;//1- stanga, 2- centru, 3- dreapta
 
@@ -149,7 +144,7 @@ public class TestBlueClose extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(-27, 45.5, Math.toRadians(-90)), Math.toRadians(90))
                 .build();
 
-        parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
+        parking[caz] = bot.drive.trajectorySequenceBuilder(preloads[caz].end())
                 .splineToConstantHeading(new Vector2d(-32, 42), Math.toRadians(-90))
                 .addDisplacementMarker(5, () -> {
                     bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
@@ -158,7 +153,7 @@ public class TestBlueClose extends LinearOpMode {
                     bot.arm.setPosition(0.96);
                     bot.lift.setTarget(0);
                 })
-                .lineToConstantHeading(new Vector2d(-50, 42))
+                .lineToConstantHeading(new Vector2d(-10, 42))
                 .build();
         }
         else if (caz == 2) { // CENTER
@@ -241,7 +236,7 @@ public class TestBlueClose extends LinearOpMode {
                     .splineToLinearHeading(new Pose2d(-29, 45.5, Math.toRadians(-90)), Math.toRadians(90))
                     .build();
 
-            parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
+            parking[caz] = bot.drive.trajectorySequenceBuilder(preloads[caz].end())
                     .splineToConstantHeading(new Vector2d(-32, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
@@ -250,7 +245,7 @@ public class TestBlueClose extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .lineToConstantHeading(new Vector2d(-50, 42))
+                    .lineToConstantHeading(new Vector2d(-10, 42))
                     .build();
         } else {
             preloads[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(-62, 12, Math.toRadians(180)))
@@ -330,7 +325,7 @@ public class TestBlueClose extends LinearOpMode {
                     .splineToLinearHeading(new Pose2d(-25, 45.5, Math.toRadians(-90)), Math.toRadians(90))
                     .build();
 
-            parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
+            parking[caz] = bot.drive.trajectorySequenceBuilder(preloads[caz].end())
                     .splineToConstantHeading(new Vector2d(-32, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
@@ -339,7 +334,7 @@ public class TestBlueClose extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .lineToConstantHeading(new Vector2d(-50, 42))
+                    .lineToConstantHeading(new Vector2d(-10, 42))
                     .build();
         }
 
@@ -577,9 +572,18 @@ public class TestBlueClose extends LinearOpMode {
         telemetry.addLine("Helloo");
         telemetry.update();
 
-        cycleOne();
+//        cycleOne();
+//
+//        cycleTwo();
 
-        cycleTwo();
+        bot.drive.followTrajectorySequence(parking[caz]);
+
+        while ((bot.drive.isBusy() || bot.lift.isBusy()) && !isStopRequested()) {
+            bot.lift.update();
+            bot.drive.update();
+            bot.printDebug(telemetry);
+            telemetry.update();
+        }
 
         webcam.closeCameraDevice();
     }

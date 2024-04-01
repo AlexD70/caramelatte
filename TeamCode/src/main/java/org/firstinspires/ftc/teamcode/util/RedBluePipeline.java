@@ -48,7 +48,7 @@ public class RedBluePipeline extends OpenCvPipeline {
 
         int crop = 60;
         if(!close){
-            crop = 125;
+            crop = 60;
         }
         Point topLeft = new Point(0, crop);
         Point bottomRight =  new Point(320, 240);
