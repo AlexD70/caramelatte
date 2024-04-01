@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @Autonomous(name = "test stack detection")
 public class TestStackDetection extends LinearOpMode {
     OpenCvWebcam webcam;
-    RedBluePipeline pipeline = new RedBluePipeline();
+    BluePipeline pipeline = new BluePipeline();
     boolean cameraOK = true;
 
     private void initDetection() {
@@ -65,11 +65,20 @@ public class TestStackDetection extends LinearOpMode {
 
         waitForStart();
 
+        while(opModeIsActive()){
+            telemetry.addData("case", pipeline.getCase());
+            telemetry.update();
+        }
+
 //        target = pipeline.targetFound;
+
+        while(opModeIsActive()){
+            telemetry.addData("redbluepipeline", pipeline.getCase());
+            telemetry.update();
+        }
 
         pipeline.killThis();
         webcam.stopStreaming();
         webcam.closeCameraDevice();
-        sleep(5000);
     }
 }

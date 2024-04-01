@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.roadrunner.drive.opmode;
+package org.firstinspires.ftc.teamcode.roadrunner.util.opmode;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive3;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer2;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -20,10 +20,10 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLoca
 public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        StandardTrackingWheelLocalizer stwl = new StandardTrackingWheelLocalizer(hardwareMap);
+        SampleMecanumDrive3 drive = new SampleMecanumDrive3(hardwareMap);
+        StandardTrackingWheelLocalizer2 stwl = new StandardTrackingWheelLocalizer2(hardwareMap);
         telemetry = new MultipleTelemetry(telemetry);
-        SampleMecanumDrive.telemetry = telemetry;
+        SampleMecanumDrive3.telemetry = telemetry;
 
         waitForStart();
 

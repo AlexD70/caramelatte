@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BluePipeline extends OpenCvPipeline {
+    // 1 - stanga 0 - centru -2 - dreapta CLOSE
     boolean kill = true;
     int stack = 0;
     boolean close = false;
@@ -34,6 +35,7 @@ public class BluePipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+
         if(kill){
             return input;
         }
@@ -42,16 +44,21 @@ public class BluePipeline extends OpenCvPipeline {
             return input;
         }
 
-        Mat whiteObjs = new Mat();
-
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
-
-        Point topLeft = new Point(0, 180);
+        int crop = 80;
+        if(!close){
+            crop = 60;
+        }
+        Point topLeft = new Point(0, crop);
         Point bottomRight =  new Point(320, 240);
         Rect roi =  new Rect(topLeft, bottomRight);
         Mat croppedInput = new Mat(input, roi);
 
-        Core.inRange(croppedInput, new Scalar(100, 150, 0), new Scalar(140, 255, 255), whiteObjs);
+
+        Mat whiteObjs = new Mat();
+
+        Imgproc.cvtColor(croppedInput, input, Imgproc.COLOR_RGB2HSV);
+
+        Core.inRange(input, new Scalar(100, 150, 0), new Scalar(140, 255, 255), whiteObjs);
 
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(whiteObjs, contours, whiteObjs, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -71,11 +78,9 @@ public class BluePipeline extends OpenCvPipeline {
             if(rect.area() > area){
                 area = rect.area();
                 target = rect;
-                rect.y += 180;
             }
         }
 
-        croppedInput.release();
         if(target == null){
             whichCase = -2;
             return input;
@@ -90,12 +95,12 @@ public class BluePipeline extends OpenCvPipeline {
                 whichCase = 0;
             }
         } else {
-            if(target.x > 130){
-                whichCase = -1;
-            } else if (target.x < 130){
-                whichCase = 0;
+            if(target.x > 180){
+                whichCase = -1; // DREAPTA
+            } else if (target.x < 180){
+                whichCase = 0; // CENTRU
             } else if (target.area() < 50) {
-                whichCase = 1;
+                whichCase = 1; // -2 STANGA
             }
         }
 

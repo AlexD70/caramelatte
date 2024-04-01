@@ -5,69 +5,111 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Outtake {
-    protected Servo s_outtakeAngleAdjust;
-    protected Servo s_angleAdjust;
-    protected Servo left_miniCLaw;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+public class Outtake implements Mechanism{
+    protected Servo s_rotateBox;
+    protected Servo s_outtakeGear;
+    protected Servo left_miniClaw;
     protected Servo right_miniClaw;
-    private Thread crsSchedulerThread = new Thread();
 
     public Outtake(@NonNull HardwareMap hwmap){
-        left_miniCLaw = hwmap.get(Servo.class, HardwareConfig.CLAW_LEFT);
+        left_miniClaw = hwmap.get(Servo.class, HardwareConfig.CLAW_LEFT);
         right_miniClaw = hwmap.get(Servo.class, HardwareConfig.CLAW_RIGHT);
-        s_outtakeAngleAdjust = hwmap.get(Servo.class, HardwareConfig.ANGLE_ADJUST_OUTTAKE);
-        s_angleAdjust = hwmap.get(Servo.class, HardwareConfig.ANGLE_ADJUST);
-        left_miniCLaw.setPosition(0);
-        right_miniClaw.setPosition(0);
+        s_rotateBox = hwmap.get(Servo.class, HardwareConfig.BOX_ROTATION);
+        s_outtakeGear = hwmap.get(Servo.class, HardwareConfig.GEAR_SERVO);
+        catchPixels();
+        s_rotateBox.setPosition(0.52);
+        s_outtakeGear.setPosition(0.75);
     }
 
 
     // ====================== OUTTAKE CLAWS =====================
 
-    public void catchPixels() {
-        left_miniCLaw.setPosition(1);
-        right_miniClaw.setPosition(1);
-    }
     public void dropBothPixels() {
-        left_miniCLaw.setPosition(0);
+        left_miniClaw.setPosition(1);
+        right_miniClaw.setPosition(0.2);
+    }
+    public void catchPixels() {
+        left_miniClaw.setPosition(0.3);
+        right_miniClaw.setPosition(0.8);
+    }
+
+    public void dropLeftPixel() throws InterruptedException{
+        left_miniClaw.setPosition(1);
+    }
+
+    public void dropRightPixel() throws InterruptedException{
         right_miniClaw.setPosition(0);
     }
 
-    public void dropleftPixel() throws InterruptedException{
-        left_miniCLaw.setPosition(0);
+    @Override
+    public int getPosition() {
+        return 0;
     }
 
-    public void droprightPixel() throws InterruptedException{
-        right_miniClaw.setPosition(0);
+    @Override
+    public boolean isBusy() {
+        return false;
     }
 
-    // ====================== OUTTAKE ANGLE ADJUST =====================
+    @Override
+    public void setTarget(int target) {
+        throw new RuntimeException("The Outtake class doesnt support setTarget(int)!");
+    }
 
-    public enum OUTTAKE_AngleAdjustStates {
-        INIT(0d), COLLECT_POS(0.3), PLACE(.9), MANUAL(-1);
+    @Override
+    public void printDebug(Telemetry telemetry) {
+
+    }
+
+    @Override
+    public void update() {
+        return;
+    }
+
+    // ====================== BOX ROTATION =====================
+
+    public enum BoxRotationStates {
+        INIT(.52), COLLECT_POS(.52), RIGHT(0.3), LEFT(0.74), MANUAL(-1);
 
         public double val;
-        OUTTAKE_AngleAdjustStates(double val){this.val = val;}
+        BoxRotationStates(double val){this.val = val;}
     }
-    private OUTTAKE_AngleAdjustStates currentOuttakeState = OUTTAKE_AngleAdjustStates.INIT;
+    private BoxRotationStates currentBoxRotation = BoxRotationStates.INIT;
 
-    public void outtakeToAngle(OUTTAKE_AngleAdjustStates state){
-        s_outtakeAngleAdjust.setPosition(state.val);
-        currentOuttakeState = state;
+    public void rotateToAngle(BoxRotationStates state){
+        s_rotateBox.setPosition(state.val);
+        currentBoxRotation = state;
     }
 
-    // ====================== ANGLE ADJUST =====================
-    public enum AngleAdjustStates {
-        INIT(0d), LEFT(0.3), RIGHT(.9), MANUAL(-1);
+    public void rotateToPos(double pos){
+        s_rotateBox.setPosition(pos);
+    }
+    public void rotateToAngleManual(double pos){
+        s_rotateBox.setPosition(pos);
+        currentBoxRotation = BoxRotationStates.MANUAL;
+    }
+
+    // ====================== GEAR =====================
+
+    public enum GearStates {
+        INIT(0.65), COLLECT(0.75), TRANSITION(0), PLACE(0.15);
 
         public double val;
-        AngleAdjustStates(double val){this.val = val;}
+        GearStates(double val){this.val = val;}
     }
-    private AngleAdjustStates currentState = AngleAdjustStates.INIT;
+    private GearStates currentGearState = GearStates.INIT;
+    private double currentGearPosition = 0.65;
 
-    public void pixelToAngle(AngleAdjustStates state){
-        s_angleAdjust.setPosition(state.val);
-        currentState = state;
+    public void gearToPos(GearStates state){
+        gearToPos(state.val);
+        currentGearState = state;
+    }
+
+    public void gearToPos(double pos){
+        s_outtakeGear.setPosition(pos);
+        currentGearPosition = pos;
     }
 
 }
