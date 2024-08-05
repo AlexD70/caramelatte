@@ -21,7 +21,7 @@ public class Arm implements Mechanism {
     }
 
     public enum ArmPositions {
-        INIT(1), COLLECT(0.98), PLACE(0.3), MANUAL(-1);
+        INIT(0.98), COLLECT(0.98), PLACE(0.2), MANUAL(-1), INTER(0.7);
 
         public double pos;
 

@@ -70,7 +70,7 @@ public class TestRedClose extends LinearOpMode {
                     .splineToLinearHeading(new Pose2d(36, 13, Math.toRadians(-30)), Math.toRadians(180))
                     .setTangent(Math.toRadians(30))
                     .setAccelConstraint(new ProfileAccelerationConstraint(25))
-                    .splineToLinearHeading(new Pose2d(43, 46, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(42, 46, Math.toRadians(-90)), Math.toRadians(90))
                     .resetAccelConstraint()
                     .addSpatialMarker(new Vector2d(53, 30), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
@@ -92,31 +92,40 @@ public class TestRedClose extends LinearOpMode {
                     })
                     .splineToLinearHeading(new Pose2d(58, 15, Math.toRadians(-90)), Math.toRadians(-90))
                     .lineToConstantHeading(new Vector2d(58, -35))
-                    .splineToLinearHeading(new Pose2d(38, -62, Math.toRadians(-90)), Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(35, -60.5, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(32, -52), () -> {
-                        bot.intake.setPosition(0.65);
+                        bot.intake.setPosition(0.35);
                         bot.intake.startCollect();
+                        sleep(50);
                     })
                     .build();
 
             toBackdropCycle1[caz] = bot.drive.trajectorySequenceBuilder(toStackCycle1[caz].end())
                     .setReversed(true)
                     .setAccelConstraint(new ProfileAccelerationConstraint(25))
-                    .splineToLinearHeading(new Pose2d(55.5, -37, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(58, -37, Math.toRadians(-90)), Math.toRadians(90))
                     .resetAccelConstraint()
-                    .lineToConstantHeading(new Vector2d(55.5, 15))
+                    .lineToConstantHeading(new Vector2d(58, 15))
                     .addSpatialMarker(new Vector2d(29, 20), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1500);
-                        sleep(100);
+                        sleep(110);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
                     .splineToLinearHeading(new Pose2d(35, 45.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .addDisplacementMarker(6, () -> {
+                        bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
+                        bot.outtake.gearToPos(Outtake.GearStates.COLLECT);
+                        sleep(300);//300
+                        bot.arm.setPosition(0.96);
+                        bot.lift.setTarget(0);
+                    })
+                    .strafeLeft(10)
                     .build();
 
 
 
-            toStackCycle2[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle1[caz].end())
+          /*  toStackCycle2[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle1[caz].end())
                     .setReversed(false)
                     .addDisplacementMarker(6, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
@@ -125,11 +134,11 @@ public class TestRedClose extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .splineToLinearHeading(new Pose2d(56, 15, Math.toRadians(-90)), Math.toRadians(-90))
-                    .lineToConstantHeading(new Vector2d(56, -35))
-                    .splineToLinearHeading(new Pose2d(37.5, -61, Math.toRadians(-90)), Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(55.5, 15, Math.toRadians(-90)), Math.toRadians(-90))
+                    .lineToConstantHeading(new Vector2d(55.5, -35))
+                    .splineToLinearHeading(new Pose2d(36, -59, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(34, -55), () -> {
-                        bot.intake.setPosition(0.7);
+                        bot.intake.setPosition(0.5);
                         bot.intake.startCollect();
                     })
                     .build();
@@ -138,17 +147,17 @@ public class TestRedClose extends LinearOpMode {
                     .setReversed(true)
                     .setAccelConstraint(new ProfileAccelerationConstraint(25))
                     .splineToLinearHeading(new Pose2d(57.5, -36, Math.toRadians(-90)), Math.toRadians(90))
-                    .lineToLinearHeading(new Pose2d(57.5, 15, Math.toRadians(-90)))
-                    .addSpatialMarker(new Vector2d(35, 20), () -> {
+                    .lineToLinearHeading(new Pose2d(57.5, 48, Math.toRadians(-90)))
+                    /*.addSpatialMarker(new Vector2d(35, 20), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1500);
                         sleep(300);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
-                    .splineToLinearHeading(new Pose2d(36, 45.5, Math.toRadians(-90)), Math.toRadians(90))
-                    .build();
+                    .splineToLinearHeading(new Pose2d(36.5, 45.5, Math.toRadians(-90)), Math.toRadians(90))*/
+                   // .build();
 
-            parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
+          /*  parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
                     .splineToConstantHeading(new Vector2d(32, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
@@ -158,14 +167,14 @@ public class TestRedClose extends LinearOpMode {
                         bot.lift.setTarget(0);
                     })
                     .lineToConstantHeading(new Vector2d(60, 42))
-                    .build();
+                    .build();*/
         }
         else if (caz == 2) { // CENTER
             preloads[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(62, 12, Math.toRadians(0)))
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(30, 12, Math.toRadians(30)), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(32, 12, Math.toRadians(30)), Math.toRadians(180))
                     .setTangent(Math.toRadians(30))
-                    .splineToLinearHeading(new Pose2d(38, 44.5, Math.toRadians(270)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(39, 45, Math.toRadians(270)), Math.toRadians(90))
                     .addSpatialMarker(new Vector2d(50, 40), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1000);
@@ -184,11 +193,11 @@ public class TestRedClose extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .splineToLinearHeading(new Pose2d(58.5, 15, Math.toRadians(-90)), Math.toRadians(-90))
-                    .lineToConstantHeading(new Vector2d(58.5, -35))
-                    .splineToLinearHeading(new Pose2d(37.5, -62, Math.toRadians(-90)), Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(55, 15, Math.toRadians(-90)), Math.toRadians(-90))
+                    .lineToConstantHeading(new Vector2d(55, -35))
+                    .splineToLinearHeading(new Pose2d(33, -61.5, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(32, -52), () -> {
-                        bot.intake.setPosition(0.68);
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
                     .build();
@@ -196,16 +205,16 @@ public class TestRedClose extends LinearOpMode {
             toBackdropCycle1[caz] = bot.drive.trajectorySequenceBuilder(toStackCycle1[caz].end())
                     .setReversed(true)
                     .setAccelConstraint(new ProfileAccelerationConstraint(25))
-                    .splineToLinearHeading(new Pose2d(55.5, -37, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(55, -37, Math.toRadians(-90)), Math.toRadians(90))
                     .resetAccelConstraint()
-                    .lineToConstantHeading(new Vector2d(55.5, 15))
+                    .lineToConstantHeading(new Vector2d(55, 15))
                     .addSpatialMarker(new Vector2d(29, 20), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1500);
                         sleep(100);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
-                    .splineToLinearHeading(new Pose2d(35, 45.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(35, 47, Math.toRadians(-90)), Math.toRadians(90))
                     .build();
 
 
@@ -219,11 +228,11 @@ public class TestRedClose extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .splineToLinearHeading(new Pose2d(56, 15, Math.toRadians(-90)), Math.toRadians(-90))
-                    .lineToConstantHeading(new Vector2d(56, -35))
-                    .splineToLinearHeading(new Pose2d(31.5, -61, Math.toRadians(-90)), Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(55, 15, Math.toRadians(-90)), Math.toRadians(-90))
+                    .lineToConstantHeading(new Vector2d(55, -35))
+                    .splineToLinearHeading(new Pose2d(33, -61, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(28, -55), () -> {
-                        bot.intake.setPosition(0.7);
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
                     .build();
@@ -232,17 +241,17 @@ public class TestRedClose extends LinearOpMode {
                     .setReversed(true)
                     .setAccelConstraint(new ProfileAccelerationConstraint(25))
                     .splineToLinearHeading(new Pose2d(56, -36, Math.toRadians(-90)), Math.toRadians(90))
-                    .lineToLinearHeading(new Pose2d(56, 15, Math.toRadians(-90)))
-                    .addSpatialMarker(new Vector2d(35, 20), () -> {
+                    .lineToLinearHeading(new Pose2d(56, 48, Math.toRadians(-90)))
+                    /*.addSpatialMarker(new Vector2d(35, 20), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1500);
                         sleep(300);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
-                    .splineToLinearHeading(new Pose2d(36, 45.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(36, 45.5, Math.toRadians(-90)), Math.toRadians(90))*/
                     .build();
 
-            parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
+           /* parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
                     .splineToConstantHeading(new Vector2d(32, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
@@ -252,14 +261,14 @@ public class TestRedClose extends LinearOpMode {
                         bot.lift.setTarget(0);
                     })
                     .lineToConstantHeading(new Vector2d(60, 42))
-                    .build();
+                    .build();*/
         } else {
             preloads[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(62, 12, Math.toRadians(0)))
                     .setReversed(true)
                     .splineToLinearHeading(new Pose2d(36, 0, Math.toRadians(30)), Math.toRadians(210))
                     .setTangent(Math.toRadians(30))
                     .setAccelConstraint(new ProfileAccelerationConstraint(25))
-                    .splineToLinearHeading(new Pose2d(30, 45.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(28, 45.5, Math.toRadians(-90)), Math.toRadians(90))
                     .resetAccelConstraint()
                     .addSpatialMarker(new Vector2d(48, 32), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
@@ -281,7 +290,7 @@ public class TestRedClose extends LinearOpMode {
                     })
                     .splineToLinearHeading(new Pose2d(58, 15, Math.toRadians(-90)), Math.toRadians(-90))
                     .lineToConstantHeading(new Vector2d(58, -35))
-                    .splineToLinearHeading(new Pose2d(36, -62, Math.toRadians(-90)), Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(33, -61, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(32, -52), () -> {
                         bot.intake.setPosition(0.6);
                         bot.intake.startCollect();
@@ -300,7 +309,7 @@ public class TestRedClose extends LinearOpMode {
                         sleep(100);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
-                    .splineToLinearHeading(new Pose2d(35, 45.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(35, 46.5, Math.toRadians(-90)), Math.toRadians(90))
                     .build();
 
 
@@ -316,9 +325,9 @@ public class TestRedClose extends LinearOpMode {
                     })
                     .splineToLinearHeading(new Pose2d(56, 15, Math.toRadians(-90)), Math.toRadians(-90))
                     .lineToConstantHeading(new Vector2d(56, -35))
-                    .splineToLinearHeading(new Pose2d(35, -61, Math.toRadians(-90)), Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(33, -61, Math.toRadians(-90)), Math.toRadians(-90))
                     .addSpatialMarker(new Vector2d(34, -55), () -> {
-                        bot.intake.setPosition(0.7);
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
                     .build();
@@ -327,17 +336,17 @@ public class TestRedClose extends LinearOpMode {
                     .setReversed(true)
                     .setAccelConstraint(new ProfileAccelerationConstraint(25))
                     .splineToLinearHeading(new Pose2d(55, -36, Math.toRadians(-90)), Math.toRadians(90))
-                    .lineToLinearHeading(new Pose2d(55, 15, Math.toRadians(-90)))
-                    .addSpatialMarker(new Vector2d(35, 20), () -> {
+                    .lineToLinearHeading(new Pose2d(55, 48, Math.toRadians(-90)))
+                    /*.addSpatialMarker(new Vector2d(35, 20), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1500);
                         sleep(300);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
-                    .splineToLinearHeading(new Pose2d(36, 45.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(36, 45.5, Math.toRadians(-90)), Math.toRadians(90))*/
                     .build();
 
-            parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
+        /*    parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle2[caz].end())
                     .splineToConstantHeading(new Vector2d(32, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
@@ -347,7 +356,7 @@ public class TestRedClose extends LinearOpMode {
                         bot.lift.setTarget(0);
                     })
                     .lineToConstantHeading(new Vector2d(60, 42))
-                    .build();
+                    .build();*/
         }
         }
 //        Pose2d afterPreloadPose = (caz == 1)?(new Pose2d(43, 46, Math.toRadians(-90))):(caz == 2)?(new Pose2d(34, 45, Math.toRadians(270))):(new Pose2d(30, 45.5, Math.toRadians(-90)));
@@ -451,7 +460,7 @@ public class TestRedClose extends LinearOpMode {
             bot.intake.stopCollect();
         }).start();
         sleep(300);
-        bot.intake.setPosition(0.64);
+        bot.intake.setPosition(0.0);
         sleep(950);
 
         bot.intake.setPosition(0.3);
@@ -469,6 +478,7 @@ public class TestRedClose extends LinearOpMode {
 
         bot.outtake.dropBothPixels();
         sleep(300);
+
     }
 
     public void cycleTwo()
@@ -490,10 +500,10 @@ public class TestRedClose extends LinearOpMode {
             bot.intake.stopCollect();
         }).start();
         sleep(300);
-        bot.intake.setPosition(0.75);
+        bot.intake.setPosition(0.45);
         sleep(950);
 
-        bot.intake.setPosition(0.3);
+        bot.intake.setPosition(0.0);
 
         bot.drive.followTrajectorySequenceAsync(toBackdropCycle2[caz]);
 
@@ -588,10 +598,9 @@ public class TestRedClose extends LinearOpMode {
 
         telemetry.addLine("Helloo");
         telemetry.update();
-
         cycleOne();
 
-        cycleTwo();
+       // cycleTwo();
     }
 
 }

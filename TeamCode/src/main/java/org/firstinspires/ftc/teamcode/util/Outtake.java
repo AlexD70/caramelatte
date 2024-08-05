@@ -32,7 +32,7 @@ public class Outtake implements Mechanism{
     }
     public void catchPixels() {
         left_miniClaw.setPosition(0.3);
-        right_miniClaw.setPosition(0.8);
+        right_miniClaw.setPosition(0.9);
     }
 
     public void dropLeftPixel() throws InterruptedException{
@@ -71,7 +71,7 @@ public class Outtake implements Mechanism{
     // ====================== BOX ROTATION =====================
 
     public enum BoxRotationStates {
-        INIT(.52), COLLECT_POS(.52), RIGHT(0.3), LEFT(0.74), MANUAL(-1);
+        INIT(.51), COLLECT_POS(.51), RIGHT(0.3), LEFT(0.74), MANUAL(-1);
 
         public double val;
         BoxRotationStates(double val){this.val = val;}
@@ -94,7 +94,7 @@ public class Outtake implements Mechanism{
     // ====================== GEAR =====================
 
     public enum GearStates {
-        INIT(0.65), COLLECT(0.75), TRANSITION(0), PLACE(0.15);
+        INIT(0.7), COLLECT(0.7), TRANSITION(0), PLACE(0.15),OUT(1);
 
         public double val;
         GearStates(double val){this.val = val;}

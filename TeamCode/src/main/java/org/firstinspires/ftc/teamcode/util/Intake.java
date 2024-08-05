@@ -65,7 +65,7 @@ public class Intake implements Mechanism {
     // ====================== ANGLE ADJUST =====================
 
     public enum BroomStates {
-        INIT(0.3), COLLECT_POS(.8), NEUTRAL(.3), MANUAL(-1);
+        INIT(0), COLLECT_POS(.45), NEUTRAL(0), MANUAL(-1);
 
         public double pos;
         BroomStates(double val){this.pos = val;}

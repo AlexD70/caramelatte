@@ -67,24 +67,28 @@ public class TestBlueFar extends LinearOpMode {
         if(caz == 1){
             preloadAndCollect[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(-62,-34,Math.toRadians(180)))
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(-34, -22,Math.toRadians(210)),Math.toRadians(0))
-                    .lineToLinearHeading(new Pose2d(-10, -53.5,Math.toRadians(270)))
-                    .addTemporalMarker(3, () -> {
-                        bot.intake.setPosition(0.58);
-                        bot.intake.startCollect();
+                    .splineToLinearHeading(new Pose2d(-34, -24,Math.toRadians(210)),Math.toRadians(0))
+                    .lineToLinearHeading(new Pose2d(-11.5, -50.5,Math.toRadians(270)))
+
+                    .addTemporalMarker(4, () -> {
+                        bot.intake.setPosition(0.45);
+                         bot.intake.startCollect();
+
                     })
                     .build();
             toBackdropPreload[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(-11, -50, Math.toRadians(-90)))
                     .setReversed(true)
                     .lineToConstantHeading(new Vector2d(-11, 25))
-                    .splineToLinearHeading(new Pose2d(-29, 57.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-36, 58, Math.toRadians(-90)), Math.toRadians(90))
                     .addSpatialMarker(new Vector2d(-20, 40), () -> {
+
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1000);
                         sleep(300);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                         bot.outtake.rotateToAngleManual(0.2);
                     })
+
                     .build();
 
             toStackCycle1[caz] = bot.drive.trajectorySequenceBuilder(toBackdropPreload[caz].end())
@@ -97,29 +101,31 @@ public class TestBlueFar extends LinearOpMode {
                         bot.lift.setTarget(0);
                     })
                     .splineToLinearHeading(new Pose2d(-9, 10, Math.toRadians(-90)), Math.toRadians(-90))
-                    .lineToLinearHeading(new Pose2d(-9, -51, Math.toRadians(-90)))
+                    .lineToLinearHeading(new Pose2d(-9, -52, Math.toRadians(-90)))
                     .addSpatialMarker(new Vector2d(-9, -50), () -> {
-                        bot.intake.setPosition(0.72);
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
-                    .strafeRight(3)
+                    .strafeRight(8)
                     .build();
 
             toBackdropCycle1[caz] = bot.drive.trajectorySequenceBuilder(toStackCycle1[caz].end())
                     .setReversed(true)
                     .splineToLinearHeading(new Pose2d(-10,-30,Math.toRadians(-90)),Math.toRadians(-90))
                     .lineToLinearHeading(new Pose2d(-10, 20, Math.toRadians(-90)))
-                    .splineToLinearHeading(new Pose2d(-26, 57.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-27, 58.5, Math.toRadians(-90)), Math.toRadians(90))
                     .addSpatialMarker(new Vector2d(-22, 50), () -> {
+                       bot.intake.startCollect();
+                       sleep(200);
+                       bot.intake.stopCollect();
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(2000);
-                        sleep(100);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
                     .build();
 
             parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle1[caz].end())
-                    .splineToConstantHeading(new Vector2d(-3, 42), Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(-11, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
                         bot.outtake.gearToPos(Outtake.GearStates.COLLECT);
@@ -127,23 +133,25 @@ public class TestBlueFar extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .lineToConstantHeading(new Vector2d(-3, 58))
+                    .lineToConstantHeading(new Vector2d(-9, 58))
                     .build();
         } else if(caz == 2){
             preloadAndCollect[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(-62,-34,Math.toRadians(180)))
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(-33,-33, Math.toRadians(210)),Math.toRadians(0))
-                    .lineToLinearHeading(new Pose2d(-10,-53.5, Math.toRadians(270)))
-                    .addTemporalMarker(3, () -> {
-                        bot.intake.setPosition(0.58);
+                    .splineToLinearHeading(new Pose2d(-33,-36, Math.toRadians(210)),Math.toRadians(0))
+                    .lineToLinearHeading(new Pose2d(-11.5,-51.5, Math.toRadians(270)))
+
+                    .addTemporalMarker(4, () -> {
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
                     .build();
             toBackdropPreload[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(-11, -50, Math.toRadians(-90)))
                     .setReversed(true)
-                    .lineToConstantHeading(new Vector2d(-11, 25))
-                    .splineToLinearHeading(new Pose2d(-24, 57.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .lineToConstantHeading(new Vector2d(-11, 28))
+                    .splineToLinearHeading(new Pose2d(-32, 57.5, Math.toRadians(-90)), Math.toRadians(90))
                     .addSpatialMarker(new Vector2d(-20, 40), () -> {
+
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(1000);
                         sleep(300);
@@ -162,10 +170,10 @@ public class TestBlueFar extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .splineToLinearHeading(new Pose2d(-9, 10, Math.toRadians(-90)), Math.toRadians(-90))
-                    .lineToLinearHeading(new Pose2d(-9, -51, Math.toRadians(-90)))
-                    .addSpatialMarker(new Vector2d(-9, -50), () -> {
-                        bot.intake.setPosition(0.72);
+                    .splineToLinearHeading(new Pose2d(-7, 10, Math.toRadians(-90)), Math.toRadians(-90))
+                    .lineToLinearHeading(new Pose2d(-7, -51, Math.toRadians(-90)))
+                    .addSpatialMarker(new Vector2d(-7, -50), () -> {
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
                     .strafeRight(8)
@@ -173,19 +181,19 @@ public class TestBlueFar extends LinearOpMode {
 
             toBackdropCycle1[caz] = bot.drive.trajectorySequenceBuilder(toStackCycle1[caz].end())
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(-10,-30,Math.toRadians(-90)),Math.toRadians(-90))
-                    .lineToLinearHeading(new Pose2d(-10, 20, Math.toRadians(-90)))
-                    .splineToLinearHeading(new Pose2d(-20, 57.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-9,-30,Math.toRadians(-90)),Math.toRadians(-90))
+                    .lineToLinearHeading(new Pose2d(-9, 20, Math.toRadians(-90)))
+                    .splineToLinearHeading(new Pose2d(-27, 57.5, Math.toRadians(-90)), Math.toRadians(90))
                     .addSpatialMarker(new Vector2d(-18, 50), () -> {
                         bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         bot.lift.setTarget(2000);
-                        sleep(100);
+
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
                     .build();
 
             parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle1[caz].end())
-                    .splineToConstantHeading(new Vector2d(-3, 42), Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(-6, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
                         bot.outtake.gearToPos(Outtake.GearStates.COLLECT);
@@ -193,29 +201,40 @@ public class TestBlueFar extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .lineToConstantHeading(new Vector2d(-3, 58))
+                    .lineToConstantHeading(new Vector2d(-9, 58))
                     .build();
         } else {
             preloadAndCollect[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(-62, -34, Math.toRadians(180)))
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(-34, -50, Math.toRadians(210)),Math.toRadians(0))
-                    .lineToLinearHeading(new Pose2d(-12, -53.5, Math.toRadians(270)))
+
+                    .splineToLinearHeading(new Pose2d(-25, -51, Math.toRadians(210)),Math.toRadians(0))
+
+                    //.lineTo( new Vector2d(-25, -50 ))
+                    .splineToLinearHeading(new Pose2d(-11, -50.5, Math.toRadians(270)), Math.toRadians(0))
                     .addTemporalMarker(3, () -> {
-                        bot.intake.setPosition(0.58);
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
                     .build();
             toBackdropPreload[caz] = bot.drive.trajectorySequenceBuilder(new Pose2d(-11, -50, Math.toRadians(-90)))
                     .setReversed(true)
                     .lineToConstantHeading(new Vector2d(-11, 25))
+                    .addSpatialMarker( new Vector2d( -11, 0), () -> {
+
+                        bot.intake.startEject();
+                    })
                     .addSpatialMarker(new Vector2d(-11, 25), () -> {
-                        bot.arm.setPosition(Arm.ArmPositions.PLACE);
+                        bot.intake.stopCollect();
+
+                        bot.arm.setPosition(Arm.ArmPositions.INTER);
+
                         bot.lift.setTarget(1000);
+                        bot.arm.setPosition(Arm.ArmPositions.PLACE);
                         sleep(300);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
-                        bot.outtake.rotateToAngleManual(0.7);
+                        bot.outtake.rotateToAngleManual(0.3);
                     })
-                    .splineToLinearHeading(new Pose2d(-23, 57.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-29, 56, Math.toRadians(-90)), Math.toRadians(90))
                     .build();
 
             toStackCycle1[caz] = bot.drive.trajectorySequenceBuilder(toBackdropPreload[caz].end())
@@ -227,10 +246,10 @@ public class TestBlueFar extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .splineToLinearHeading(new Pose2d(-9, 10, Math.toRadians(-90)), Math.toRadians(-90))
-                    .lineToLinearHeading(new Pose2d(-9, -51, Math.toRadians(-90)))
-                    .addSpatialMarker(new Vector2d(-9, -50), () -> {
-                        bot.intake.setPosition(0.7);
+                    .splineToLinearHeading(new Pose2d(-13, 10, Math.toRadians(-90)), Math.toRadians(-90))
+                    .lineToLinearHeading(new Pose2d(-13, -51, Math.toRadians(-90)))
+                    .addSpatialMarker(new Vector2d(-13, -50), () -> {
+                        bot.intake.setPosition(0.45);
                         bot.intake.startCollect();
                     })
                     .strafeRight(8)
@@ -238,19 +257,29 @@ public class TestBlueFar extends LinearOpMode {
 
             toBackdropCycle1[caz] = bot.drive.trajectorySequenceBuilder(toStackCycle1[caz].end())
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(-9,-40,Math.toRadians(-90)),Math.toRadians(-90))
+
+                    .lineToLinearHeading(new Pose2d(-9,-40,Math.toRadians(-90)))
+                    .addSpatialMarker( new Vector2d( -9, 0), () -> {
+
+                        bot.intake.startEject();
+                    })
                     .lineToLinearHeading(new Pose2d(-9, 20, Math.toRadians(-90)))
-                    .splineToLinearHeading(new Pose2d(-20, 57.5, Math.toRadians(-90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-39, 57.5, Math.toRadians(-90)), Math.toRadians(90))
                     .addSpatialMarker(new Vector2d(-18, 50), () -> {
-                        bot.arm.setPosition(Arm.ArmPositions.PLACE);
+
+                        bot.intake.stopCollect();
+                        bot.arm.setPosition(Arm.ArmPositions.INTER);
+
                         bot.lift.setTarget(1500);
+                        bot.arm.setPosition(Arm.ArmPositions.PLACE);
+
                         sleep(100);
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                     })
                     .build();
 
             parking[caz] = bot.drive.trajectorySequenceBuilder(toBackdropCycle1[caz].end())
-                    .splineToConstantHeading(new Vector2d(-3, 42), Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(-16, 42), Math.toRadians(-90))
                     .addDisplacementMarker(5, () -> {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
                         bot.outtake.gearToPos(Outtake.GearStates.COLLECT);
@@ -258,7 +287,7 @@ public class TestBlueFar extends LinearOpMode {
                         bot.arm.setPosition(0.96);
                         bot.lift.setTarget(0);
                     })
-                    .lineToConstantHeading(new Vector2d(-3, 56))
+                    .lineToConstantHeading(new Vector2d(-16, 58))
                     .build();
         }
 
@@ -280,12 +309,15 @@ public class TestBlueFar extends LinearOpMode {
             bot.intake.startEject();
             sleep(500);//1000
             bot.intake.stopCollect();
+
+
         }).start();
         sleep(300);
-        bot.intake.setPosition(0.8);
+        bot.intake.setPosition(0.45);
         sleep(950);
 
-        bot.intake.setPosition(0.3);
+
+        bot.intake.setPosition(0.0);
 
 
         bot.drive.followTrajectorySequenceAsync(toBackdropCycle1[caz]);
@@ -325,7 +357,7 @@ public class TestBlueFar extends LinearOpMode {
                         .splineToLinearHeading(new Pose2d(-11, 15, Math.toRadians(-90)), Math.toRadians(-90))
                         .lineToLinearHeading(new Pose2d(-11,-52.5,Math.toRadians(-90)))
                         .addSpatialMarker(new Vector2d(-11, -50), () -> {
-                            bot.intake.setPosition(0.9);
+                            bot.intake.setPosition(0.45);
                             bot.intake.startCollect();
                         })
                         .build()
@@ -339,7 +371,7 @@ public class TestBlueFar extends LinearOpMode {
         }
 
         sleep(1000);//500
-        bot.intake.setPosition(0.3);
+        bot.intake.setPosition(0.0);
 
         new Thread(() -> {
             sleep(1500);//1000
@@ -446,10 +478,10 @@ public class TestBlueFar extends LinearOpMode {
             bot.intake.stopCollect();
         }).start();
         sleep(300);
-        bot.intake.setPosition(0.8);
+        bot.intake.setPosition(0.45);
         sleep(950);
 
-        bot.intake.setPosition(0.3);
+        bot.intake.setPosition(0.0);
 
         bot.drive.followTrajectorySequenceAsync(toBackdropPreload[caz]);
 
@@ -483,7 +515,7 @@ public class TestBlueFar extends LinearOpMode {
             telemetry.update();
         }
 
-        sleep(300);
+        sleep(350);
         bot.outtake.dropBothPixels();
 
         bot.drive.followTrajectorySequenceAsync(parking[caz]);

@@ -24,7 +24,8 @@ public class RedFarSafe extends LinearOpMode {
         waitForStart();
         bot.drive.setPoseEstimate(new Pose2d(62,-34,Math.toRadians(0)));
         bot.drive.followTrajectorySequence(
-        bot.drive.trajectorySequenceBuilder(new Pose2d(62,-34,Math.toRadians(0)))
+        bot.drive.trajectorySequenceBuilder(new Pose2d(
+                62,-34,Math.toRadians(0)))
                 .lineTo(new Vector2d(11,-32))
                 .splineToLinearHeading(new Pose2d(11,-25,Math.toRadians(90)),Math.toRadians(90))
                 .lineToConstantHeading(new Vector2d(11,50))

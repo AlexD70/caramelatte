@@ -24,8 +24,9 @@ public class TeleOpV2 extends LinearOpMode {
 
     public boolean isLimited = true;
     public static double LIFTER_MANUAL_WEIGHT = 16, LIFTER_MANUAL_THRESH = 0.2;
-    public void overrideLimits(boolean button){
-        if(button){
+
+    public void overrideLimits(boolean button) {
+        if (button) {
             isLimited = false;
         }
     }
@@ -35,23 +36,23 @@ public class TeleOpV2 extends LinearOpMode {
 
     public Thread uniqueThread = new Thread();
 
-    public void controlLifterManually(double movement){
-        if(bot.lift.isBusy()){
+    public void controlLifterManually(double movement) {
+        if (bot.lift.isBusy()) {
             deltaLifter = 0;
             lifterInManual = 0;
             return;
         }
 
-        if(Math.abs(movement) > LIFTER_MANUAL_THRESH){
+        if (Math.abs(movement) > LIFTER_MANUAL_THRESH) {
             lifterInManual += 1;
-            if(lifterInManual == 1){
+            if (lifterInManual == 1) {
                 lifterInitial = bot.lift.getPosition();
             }
             deltaLifter += movement * LIFTER_MANUAL_WEIGHT;
-            if(isLimited) {
+            if (isLimited) {
                 bot.lift.setTarget(Range.clip((int) (lifterInitial + deltaLifter), 0, 2800));
             } else {
-                bot.lift.setTarget((int)(lifterInitial + deltaLifter));
+                bot.lift.setTarget((int) (lifterInitial + deltaLifter));
             }
         } else {
             lifterInManual = 0;
@@ -71,8 +72,8 @@ public class TeleOpV2 extends LinearOpMode {
 
         waitForStart();
 
-        while(opModeIsActive() && !isStopRequested()){
-            if(bot.intake.getPosition() != -1 && isInPlaceMode){
+        while (opModeIsActive() && !isStopRequested()) {
+            if (bot.intake.getPosition() != -1 && isInPlaceMode) {
                 bot.intake.setPosition(Intake.BroomStates.NEUTRAL);
                 bot.intake.stopCollect();
             }
@@ -88,10 +89,10 @@ public class TeleOpV2 extends LinearOpMode {
             ).times(weight));
 
             // to place state
-            if(ctrl2.cross.isPressed()){
+            if (ctrl2.cross.isPressed()) {
                 uniqueThread.interrupt();
                 uniqueThread = new Thread(() -> {
-                    if(!isInPlaceMode) {
+                    if (!isInPlaceMode) {
                         bot.outtake.catchPixels();
                         pixelsLocked = true;
                         sleep(300);
@@ -112,20 +113,20 @@ public class TeleOpV2 extends LinearOpMode {
             }
 
             // lifter high when in place
-            if(ctrl2.dpadUp.isPressed()){
+            if (ctrl2.dpadUp.isPressed()) {
                 uniqueThread.interrupt();
                 uniqueThread = new Thread(() -> {
                     if (!isInPlaceMode) {
                         bot.outtake.catchPixels();
                         pixelsLocked = true;
                         sleep(300);
-                        if(Thread.currentThread().isInterrupted()){
+                        if (Thread.currentThread().isInterrupted()) {
                             return;
                         }
                         bot.outtake.gearToPos(Outtake.GearStates.PLACE);
                         uniqueThread = new Thread(() -> {
                             sleep(300);
-                            if(Thread.currentThread().isInterrupted()){
+                            if (Thread.currentThread().isInterrupted()) {
                                 return;
                             }
                             bot.arm.setPosition(Arm.ArmPositions.PLACE);
@@ -139,14 +140,14 @@ public class TeleOpV2 extends LinearOpMode {
             }
 
             // to collect state
-            if(ctrl2.circle.isPressed()){
+            if (ctrl2.circle.isPressed()) {
                 uniqueThread.interrupt();
                 uniqueThread = new Thread(() -> {
                     if (isInPlaceMode) {
                         bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
                         bot.outtake.gearToPos(Outtake.GearStates.COLLECT);
                         sleep(300);
-                        if(Thread.currentThread().isInterrupted()){
+                        if (Thread.currentThread().isInterrupted()) {
                             return;
                         }
                         bot.lift.setTarget(0);
@@ -158,49 +159,58 @@ public class TeleOpV2 extends LinearOpMode {
                 });
                 uniqueThread.start();
             }
+            if(ctrl2.dpadDown.isPressed()){
+
+                  if(!isInPlaceMode) {
+                      bot.lift.setTarget(650);
+                      bot.outtake.gearToPos(Outtake.GearStates.OUT);
+
+                  }
+
+                }
 
 
-            if(ctrl2.isRightTriggerPressed()){
+            if (ctrl2.isRightTriggerPressed()) {
                 bot.intake.setPosition(Intake.BroomStates.COLLECT_POS);
                 bot.intake.startCollect();
             }
 
-            if (ctrl2.square.isPressed()){
+            if (ctrl2.square.isPressed()) {
                 bot.intake.stopCollect();
                 bot.intake.setPosition(Intake.BroomStates.INIT);
             }
 
-            if (ctrl2.isLeftTriggerPressed()){
+            if (ctrl2.isLeftTriggerPressed()) {
                 bot.intake.startEject();
             }
 
-            if (ctrl2.bumperRight.isPressed()){
+            if (ctrl2.bumperRight.isPressed()) {
                 bot.outtake.rotateToAngle(Outtake.BoxRotationStates.LEFT);
             }
 
-            if (ctrl2.bumperLeft.isPressed()){
+            if (ctrl2.bumperLeft.isPressed()) {
                 bot.outtake.rotateToAngle(Outtake.BoxRotationStates.RIGHT);
             }
 
-            if (ctrl2.triangle.isPressed()){
+            if (ctrl2.triangle.isPressed()) {
                 bot.outtake.rotateToAngle(Outtake.BoxRotationStates.COLLECT_POS);
             }
-                // pixel control
+            // pixel control
 
             // drop left & right
-            if(ctrl1.dpadLeft.isPressed()){
+            if (ctrl1.dpadLeft.isPressed()) {
                 bot.outtake.dropLeftPixel();
                 pixelsLocked = false;
             }
 
-            if(ctrl1.dpadRight.isPressed()){
+            if (ctrl1.dpadRight.isPressed()) {
                 bot.outtake.dropRightPixel();
                 pixelsLocked = false;
             }
 
             // lock/unlock pixels
-            if(ctrl1.cross.isPressed()){
-                if(pixelsLocked){
+            if (ctrl1.cross.isPressed()) {
+                if (pixelsLocked) {
                     bot.outtake.dropBothPixels();
                     pixelsLocked = false;
                 } else {
@@ -209,21 +219,22 @@ public class TeleOpV2 extends LinearOpMode {
                 }
             }
 
+
             // plane control
-            if(ctrl1.bumperLeft.isPressed()){
+            if (ctrl1.bumperLeft.isPressed()) {
                 bot.launcher.launchPlane();
             }
 
             // hanging bot
-            if(ctrl1.isLeftTriggerPressed()){
-                if(isInPlaceMode) {
+            if (ctrl1.isLeftTriggerPressed()) {
+                if (isInPlaceMode) {
                     bot.lift.setTarget(600);
                 }
             }
 
-            if(ctrl1.bumperRight.isPressed()){
+            if (ctrl1.bumperRight.isPressed()) {
                 weight = 0.5;
-            } else if (ctrl1.bumperRight.isReleased()){
+            } else if (ctrl1.bumperRight.isReleased()) {
                 weight = 1;
             }
 
@@ -232,6 +243,8 @@ public class TeleOpV2 extends LinearOpMode {
 
             // limit override
             overrideLimits(ctrl2.share.isPressed());
+
         }
+
     }
 }
